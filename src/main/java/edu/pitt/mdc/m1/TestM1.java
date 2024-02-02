@@ -1,0 +1,181 @@
+package edu.pitt.mdc.m1;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
+//test comment
+// at the moment, this routine only tests M1-data-format-only search triggered by one new software (ID 1000)
+// Must loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
+public class TestM1 {
+
+	public static void main(String args[]) throws CloneNotSupportedException
+	{
+		//	Software(Integer objectId, PortType portType, int portNumber) 
+
+		ArrayList<DigitalResearchObject> dros = new ArrayList<DigitalResearchObject>();
+		Integer softwareId =1000, datasetId = 300;
+		Integer dataFormat = 1;
+		int portNumber = 0;
+		String softwareTitle = "Software X", datasetTitle = "Dataset Y";
+		Software op = new Software(softwareTitle, softwareId, PortType.INPUT, portNumber);
+		Dataset ds = new Dataset(datasetTitle, datasetId, dataFormat);
+		dros.add(ds);
+		dros.add(op);
+		HashMap <Integer, ArrayList<DigitalResearchObject>> hm = new HashMap <Integer, ArrayList<DigitalResearchObject>
+		>();
+		hm.put(1000, dros);
+		dros = hm.get(1000);
+		
+		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
+		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001,2002)); //2000 somehow causes cycle
+		Iterator<Integer> iterSoftwareList = softwareList.iterator();
+		while(iterSoftwareList.hasNext()) {
+			int softwareID = iterSoftwareList.next();
+			SoftwareNode s = new SoftwareNode(softwareID);
+
+			// get the info about software from the repository   get input ports and get output ports
+			ArrayList<Integer> inputs = SoftwareDatasetDataFormatRepository.getInputDataFormatsForSoftware(softwareID);
+			ArrayList<Integer> outputs = SoftwareDatasetDataFormatRepository.getOutputDataFormatsForSoftware(softwareID);
+			Iterator<Integer> iterI = inputs.iterator();
+			Iterator<Integer> iterO = outputs.iterator();
+
+			int portCtr = 0;
+			while (iterI.hasNext()) {
+				//SoftwarePort(Integer softwareID, int type, Integer dataFormatID)
+				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, iterI.next());
+				p.setPortId(portCtr++);
+				s.inputPorts.add(p);
+			}
+
+			portCtr = 0;
+			while (iterO.hasNext()) {
+				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, iterO.next());
+				p.setPortId(portCtr++);
+				s.outputPorts.add(p);
+			}
+
+			MutableValueGraph<Node, Integer> g = ValueGraphBuilder.directed().build();
+			g.addNode(s);
+			System.out.println("***********************************");
+			System.out.println("SOFTWARE " + softwareID + " is triggering M1 search:");
+			System.out.println("***********************************");
+			GenerateAndTestGuava.printGraph(g);
+			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
+			GenerateAndTestGuava.backSearch(g);
+
+		}
+
+	/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
+		ArrayList<MutableValueGraph<Node, Integer>> gList;
+		gList =GenerateAndTestGuava.getGraphList(); 
+			
+		System.out.println("Number of graphs = " + gList.size());
+		System.out.println("Size distribution (number of software nodes)");
+		
+		Iterator<MutableValueGraph<Node, Integer>> iter = gList.iterator();
+		
+		MutableValueGraph<Node, Integer> g;
+		
+		// ndc means nodeCountDistribution
+		ArrayList<Integer> ndc = new ArrayList<Integer>();
+		// initialize with zero counts
+		
+		int nc;  //nodecount
+		int previousNc;
+		while (iter.hasNext() ) {
+			g = iter.next();
+			nc = g.nodes().size();
+			previousNc = ndc.get(nc);
+			ndc.set(nc,++previousNc);
+
+		}
+	*/		
+
+	
+
+
+
+		// Bill's file reading code. It isn't being used at the moment, but isn't commented out either!
+		ArrayList<DatasetNode> dsNodes = new ArrayList<>();
+
+		// creates the software and dataset repositories ??? are they hashed on data formats???
+		try {
+			FileReader fr = new FileReader("src/main/resources/dummy-datasets.json");
+			JsonReader jr = new JsonReader(fr);
+			JsonElement je = JsonParser.parseReader(jr);
+			Gson gs = new Gson();
+			if (je.isJsonArray()) {
+				JsonArray ja = je.getAsJsonArray();
+				Iterator<JsonElement> i = ja.iterator();
+				while (i.hasNext()) {
+					JsonElement jei = i.next();
+					DatasetNode dn = gs.fromJson(jei, DatasetNode.class);
+					dsNodes.add(dn);
+				}
+			}
+			//System.out.println(dsNodes.size() + " datasets.");
+			//System.out.println("\tDEBUG: " + dsNodes.get(0).id + "\t" + dsNodes.get(0).name + "\t" + dsNodes.get(0).formatId);
+			DatasetManager dm = new DatasetManager(dsNodes);
+			Iterator<DatasetNode> i = dm.getDatasetsForFormatId(Integer.valueOf(1));
+			//System.out.println("DEBUG: Datasets for formatId=" + 1);
+			while (i.hasNext()) {
+				DatasetNode d = i.next();
+			//	System.out.println("\tDEBUG: " + d.id + "\t" + d.name + "\t" + d.formatId);
+			}
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+
+	public static MutableValueGraph<Node, Integer>  makeDagClone(MutableValueGraph<Node, Integer>  g)
+	{
+		MutableValueGraph<Node, Integer>  g1 = ValueGraphBuilder.directed().build();
+
+		//make copies of all SoftwareNode and Ports in g
+		SoftwareNode s, s1;
+		SoftwarePort ip, ip1, op, op1;
+		
+		Iterator<Node> iter = g.nodes().iterator();
+		while (iter.hasNext() ) {
+			s = (SoftwareNode) iter.next();
+			s1 = new SoftwareNode(s.uid);  // constructor requires a uid and we want the graph to have the same software as the old!
+			
+			Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();
+			while(iterIP.hasNext()){
+				ip = iterIP.next();
+				ip1 = new SoftwarePort(ip.softwareID, ip.type, ip.dataFormatID);
+				
+				ip1.setPortId(ip.getPortId());
+				ip1.setBoundToObjectId(ip.getBoundToObjectId());				
+				ip1.setBoundToSoftwarePortArrayIndex(ip.getBoundToSoftwarePortArrayIndex());
+				
+				s1.inputPorts.add(ip1);
+			}
+			int portCtr = 0;
+			Iterator<SoftwarePort> iterOP = s.outputPorts.iterator();
+			while(iterOP.hasNext()){
+				op = iterOP.next();
+				op1 = new SoftwarePort(op.softwareID, op.type, op.dataFormatID);
+				
+				op1.setPortId(op.getPortId());
+				op1.setBoundToObjectId(op.getBoundToObjectId());				
+				op1.setBoundToSoftwarePortArrayIndex(op.getBoundToSoftwarePortArrayIndex());
+				
+				s1.outputPorts.add(op1);
+			}
+			g1.addNode(s1);
+		}
+		return g1;
+	}
+}
