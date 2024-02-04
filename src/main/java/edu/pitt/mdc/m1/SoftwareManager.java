@@ -76,6 +76,8 @@ public class SoftwareManager {
 			JsonElement firstFormatAsJe = j.next();
 			int formatId = firstFormatAsJe.getAsInt();
 			SoftwarePort sp = new SoftwarePort(softwareId, PortType.INPUT, formatId);
+			int portNumber = numAsJp.getAsInt();
+			sp.setPortId(portNumber-1);
 			inputPorts.add(sp);
 		}
 		return inputPorts;
@@ -93,6 +95,8 @@ public class SoftwareManager {
 			JsonElement firstFormatAsJe = j.next();
 			int formatId = firstFormatAsJe.getAsInt();
 			SoftwarePort sp = new SoftwarePort(softwareId, PortType.OUTPUT, formatId);
+			int portNumber = numAsJp.getAsInt();
+			sp.setPortId(portNumber-1);
 			outputPorts.add(sp);
 		}
 		return outputPorts;
