@@ -5,6 +5,8 @@ import com.google.common.graph.Graphs;
 
 public class GenerateAndTestGuava {
 
+	static SoftwareDatasetDataFormatRepository sddfr = new SoftwareDatasetDataFormatRepository();
+
 	// gList accumulates the graphs composed by M1
 	static ArrayList<MutableValueGraph<Node, Integer>> gList = null;
 	
@@ -46,7 +48,7 @@ public class GenerateAndTestGuava {
 			ugo = iterUgol.next();
 	    	
 	    	//get list of repository software w/ input port that data-format matches w/ the unbound graph output port
-			dfMatchingSoftwareList = SoftwareDatasetDataFormatRepository.softwareByInputDataformat(ugo.dataFormatId); 
+			dfMatchingSoftwareList = sddfr.softwareByInputDataformat(ugo.dataFormatId); 
 			// if list is empty, there are no repository software matching this unbound graph output port, so leave it unbound
 			if (dfMatchingSoftwareList.isEmpty()) {  // cleaner to use (!dfMatching...) ?
 			} 
@@ -118,7 +120,7 @@ public class GenerateAndTestGuava {
 		while (iterP.hasNext()) { //Loop populates dataset and software DF-matching structures AND counts unbound inputs in g
 	    	dataFormatID = iterP.next().dataFormatId; //dataFormatID of unbound input port
 	    	numUnboundInputs++;
-			oneDfMatchingInputObjectList = SoftwareDatasetDataFormatRepository.objectsByDataformat(dataFormatID); // returns list of datasets w/ dataFormatID and software w/ dataFormatID for output
+			oneDfMatchingInputObjectList = sddfr.objectsByDataformat(dataFormatID); // returns list of datasets w/ dataFormatID and software w/ dataFormatID for output
 			if (oneDfMatchingInputObjectList.isEmpty()) {
 			   System.out.println("\n FYI: exiting backsearch (returns FALSE) due to zero DF-matching instantiations of an unbound input port for this graph! \n"); 
 			   return false;
@@ -394,7 +396,7 @@ public class GenerateAndTestGuava {
 	public static SoftwareNode makeSoftwareNode(Integer softwareID) {
 		SoftwareNode sn  = new SoftwareNode(softwareID);
 		//get the input ports for the software and add them to the SoftwareNode
-		Iterator<Integer> iterI = SoftwareDatasetDataFormatRepository.getInputDataFormatsForSoftware(softwareID).iterator();
+		Iterator<Integer> iterI = sddfr.getInputDataFormatsForSoftware(softwareID).iterator();
 		Integer portID =0;   // more accurate to say that input ports are numbered from 0 within each software.
 		while (iterI.hasNext()) {
 			SoftwarePort ip = new SoftwarePort(softwareID,PortType.OUTPUT,iterI.next()); //softwareID, type (0=output, 1=input), dataformatID  
@@ -402,7 +404,7 @@ public class GenerateAndTestGuava {
 			sn.inputPorts.add(ip);
 		}
 		//get the output ports for the software and add them to the SoftwareNode
-		Iterator<Integer> iterO = SoftwareDatasetDataFormatRepository.getOutputDataFormatsForSoftware(softwareID).iterator();
+		Iterator<Integer> iterO = sddfr.getOutputDataFormatsForSoftware(softwareID).iterator();
 		portID =0;
 		while (iterO.hasNext()) {
 			SoftwarePort op = new SoftwarePort(softwareID,PortType.INPUT,iterO.next()); // softwareID, type (0=output, 1=input), dataformatID  

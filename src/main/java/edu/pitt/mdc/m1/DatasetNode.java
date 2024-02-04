@@ -3,24 +3,24 @@ package edu.pitt.mdc.m1;
 public class DatasetNode extends Node {
 	int id;
 	int formatId;
-	String name;
+	String title;
 
-	public DatasetNode(int id, int formatId, String name) {
+	public DatasetNode(int id, int formatId, String title) {
 		this.id = id;
-		this.name = name;
+		this.title = title;
 		this.formatId = formatId;
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public int getFormatId() {
-		return formatId;
+		return this.formatId;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return this.title;
 	}
 
 } // For future use. No need to represent datasets as nodes until software are enacted and producing output datasets

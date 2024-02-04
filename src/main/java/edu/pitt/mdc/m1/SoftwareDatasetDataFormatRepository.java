@@ -1,57 +1,115 @@
 package edu.pitt.mdc.m1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 public class SoftwareDatasetDataFormatRepository {
 	
+	HashMap<Integer, ArrayList<DigitalResearchObject>> objectList;
+	HashMap<Integer, ArrayList<Software>> softwareList;
+	HashMap<Integer, ArrayList<Integer>> inputsAndFormats;
+	HashMap<Integer, ArrayList<Integer>> outputsAndFormats;
+
+	public static SoftwareDatasetDataFormatRepository createTestCollectionInstance() {
+		SoftwareDatasetDataFormatRepository testCollection = 
+			new SoftwareDatasetDataFormatRepository();
+		testCollection.objectList = createObjectListTestCollection();
+		testCollection.softwareList = createSoftwareListTestCollection();
+		testCollection.inputsAndFormats = createInputsAndFormatsTestCollection();
+		testCollection.outputsAndFormats = createOutputsAndFormatsTestCollection();
+		return testCollection;
+	}
 
 	// Given a data format, this method returns a heterogeneous list of datasets and software using that format.
 	// The returned software uses the data format for at least one OUTPUT
+	public SoftwareDatasetDataFormatRepository() {
 
-		public static ArrayList<DigitalResearchObject> objectsByDataformat(Integer dataFormatID){
-			ArrayList<DigitalResearchObject> objectList = new ArrayList<DigitalResearchObject>();
-			switch(dataFormatID) {
-			//Dataset( String title, Integer datasetId, Integer dataFormat)
-			//Software(String title, Integer softwareId, PortType portType, int portNumber)
+	}
 
-			case 1: 	// Data Format 1
-				objectList.add(new Dataset("Dataset 100", 100, 1));  
-				objectList.add(new Dataset("Dataset 101", 101, 1));
-				objectList.add(new Dataset("Dataset 102", 102, 1));
-				objectList.add(new Software("Software 1000", 1000, PortType.OUTPUT, 0));  
-				objectList.add(new Software("Software 1001", 1001, PortType.OUTPUT, 0));
-				objectList.add(new Software("Software 1002", 1002, PortType.OUTPUT, 0));
-				objectList.add(new Software("Software 2001", 2001, PortType.OUTPUT, 0));
-				break;
-				
-			case 2:    // Data format 2
-				objectList.add(new Dataset("Dataset 200", 200, 2));
-				objectList.add(new Dataset("Dataset 201", 201, 2));
-				objectList.add(new Dataset("Dataset 202", 202, 2));
-				objectList.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0));
-				break;
+	public static HashMap<Integer, ArrayList<DigitalResearchObject>> createObjectListTestCollection() {
+		
+		HashMap<Integer, ArrayList<DigitalResearchObject>> formatToObjectList = 
+			new HashMap<Integer, ArrayList<DigitalResearchObject>>();
+		//Dataset( String title, Integer datasetId, Integer dataFormat)
+		//Software(String title, Integer softwareId, PortType portType, int portNumber)
+
+		ArrayList<DigitalResearchObject> objectList1 = new ArrayList<DigitalResearchObject>();
+			objectList1.add(new Dataset("Dataset 100", 100, 1));  
+			objectList1.add(new Dataset("Dataset 101", 101, 1));
+			objectList1.add(new Dataset("Dataset 102", 102, 1));
+			objectList1.add(new Software("Software 1000", 1000, PortType.OUTPUT, 0));  
+			objectList1.add(new Software("Software 1001", 1001, PortType.OUTPUT, 0));
+			objectList1.add(new Software("Software 1002", 1002, PortType.OUTPUT, 0));
+			objectList1.add(new Software("Software 2001", 2001, PortType.OUTPUT, 0));
+		formatToObjectList.put(Integer.valueOf(1), objectList1);
 			
-			case 3:
-				objectList.add(new Dataset("Dataset 300", 300, 3));
-				objectList.add(new Dataset("Dataset 301", 301, 3));
-				objectList.add(new Dataset("Dataset 302", 302, 3));
-				break;
-			
-			case 4:
-				objectList.add(new Dataset("Dataset 400", 400, 4));
-				break;
-			case 5:
-				//objectList.add(new Dataset("Dataset 500", 500, 5));
-				break;
-			case 6:
-				objectList.add(new Dataset("Dataset 600", 600, 6));   // TODO: comment out to to see if the code breaks 
-				objectList.add(new Software("Software 1000", 1000, PortType.OUTPUT, 1)); // software 1000 has two outputs.  Make sure it is consistent with getOutputDataFormatsForSoftware
-				break;
-			}
-			return objectList;
+		ArrayList<DigitalResearchObject> objectList2 = new ArrayList<DigitalResearchObject>();
+			objectList2.add(new Dataset("Dataset 200", 200, 2));
+			objectList2.add(new Dataset("Dataset 201", 201, 2));
+			objectList2.add(new Dataset("Dataset 202", 202, 2));
+			objectList2.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0));
+		formatToObjectList.put(Integer.valueOf(2), objectList2);	
+		
+		ArrayList<DigitalResearchObject> objectList3 = new ArrayList<DigitalResearchObject>();
+			objectList3.add(new Dataset("Dataset 300", 300, 3));
+			objectList3.add(new Dataset("Dataset 301", 301, 3));
+			objectList3.add(new Dataset("Dataset 302", 302, 3));
+		formatToObjectList.put(Integer.valueOf(3), objectList3);
+		
+		ArrayList<DigitalResearchObject> objectList4 = new ArrayList<DigitalResearchObject>();
+			objectList4.add(new Dataset("Dataset 400", 400, 4));
+		formatToObjectList.put(Integer.valueOf(4), objectList4);
+
+		ArrayList<DigitalResearchObject> objectList5 = new ArrayList<DigitalResearchObject>();
+			//objectList5.add(new Dataset("Dataset 500", 500, 5));
+		formatToObjectList.put(Integer.valueOf(5), objectList5);	
+
+		ArrayList<DigitalResearchObject> objectList6 = new ArrayList<DigitalResearchObject>();
+			objectList6.add(new Dataset("Dataset 600", 600, 6));   // TODO: comment out to to see if the code breaks 
+			objectList6.add(new Software("Software 1000", 1000, PortType.OUTPUT, 1)); // software 1000 has two outputs.  Make sure it is consistent with getOutputDataFormatsForSoftware
+		formatToObjectList.put(Integer.valueOf(6), objectList6);	
+		
+		return formatToObjectList;
+	}
+
+		public ArrayList<DigitalResearchObject> objectsByDataformat(Integer dataFormatID){
+			return this.objectList.get(dataFormatID);
 		}
 			
+	public static HashMap<Integer, ArrayList<Software>> createSoftwareListTestCollection() {
+		
+		HashMap<Integer, ArrayList<Software>> formatToSoftwareList = 
+			new HashMap<Integer, ArrayList<Software>>();
+
+		ArrayList<Software> softwareList1 = new ArrayList<Software>();
+		formatToSoftwareList.put(Integer.valueOf(1), softwareList1);
+
+		ArrayList<Software> softwareList2 = new ArrayList<Software>();  // Data format 2
+			softwareList2.add(new Software("Software 1000", 1000, PortType.INPUT, 0));  
+			softwareList2.add(new Software("Software 1001", 1001, PortType.INPUT, 0));   
+		formatToSoftwareList.put(Integer.valueOf(2), softwareList2);
+
+		ArrayList<Software> softwareList3 = new ArrayList<Software>();
+			softwareList3.add(new Software("Software 1000", 1000, PortType.INPUT, 1));  
+			softwareList3.add(new Software("Software 2000", 2000, PortType.INPUT, 0)); 
+			softwareList3.add(new Software("Software 2002", 2002, PortType.INPUT, 0)); 
+		formatToSoftwareList.put(Integer.valueOf(3), softwareList3);	
+		
+		ArrayList<Software> softwareList4 = new ArrayList<Software>();
+			softwareList4.add(new Software("Software 2000", 2000, PortType.INPUT, 1)); 
+		formatToSoftwareList.put(Integer.valueOf(4), softwareList4);			
+			
+		ArrayList<Software> softwareList5 = new ArrayList<Software>();
+			softwareList5.add(new Software("Software 1002", 1002, PortType.INPUT, 0)); 
+		formatToSoftwareList.put(Integer.valueOf(5), softwareList5);			
+			
+		ArrayList<Software> softwareList6 = new ArrayList<Software>();
+			softwareList6.add(new Software("Software 2001", 2001, PortType.INPUT, 0)); 
+		formatToSoftwareList.put(Integer.valueOf(6), softwareList6);			
+		
+		return formatToSoftwareList;			
+	}
 
 		// Given a data format, this method returns software that use that data format for at least 1 input
 		// If a software were to have 2 inputs using the same data format, and they were both represented as lines in this file
@@ -60,88 +118,95 @@ public class SoftwareDatasetDataFormatRepository {
 		
 		// Software(String title, Integer softwareId, PortType portType, int portNumber)
 		
-		public static ArrayList<Software> softwareByInputDataformat(Integer dataFormatID){
-			ArrayList<Software> softwareList = new ArrayList<Software>();
-			switch(dataFormatID) {
-			case 1: 	// Data Format 1
-
-				break;
-				
-			case 2:     // Data format 2
-				softwareList.add(new Software("Software 1000", 1000, PortType.INPUT, 0));  
-				softwareList.add(new Software("Software 1001", 1001, PortType.INPUT, 0));   
-				break;
-			
-			case 3:
-				softwareList.add(new Software("Software 1000", 1000, PortType.INPUT, 1));  
-				softwareList.add(new Software("Software 2000", 2000, PortType.INPUT, 0)); 
-				softwareList.add(new Software("Software 2002", 2002, PortType.INPUT, 0)); 
-				break;
-			
-			case 4:
-				softwareList.add(new Software("Software 2000", 2000, PortType.INPUT, 1)); 
-				break;
-				
-			case 5:
-				softwareList.add(new Software("Software 1002", 1002, PortType.INPUT, 0)); 
-				break;
-				
-			case 6:
-				softwareList.add(new Software("Software 2001", 2001, PortType.INPUT, 0)); 
-				break;
-			}
-			return softwareList;
+		public ArrayList<Software> softwareByInputDataformat(Integer dataFormatID){
+			return this.softwareList.get(dataFormatID);
 		}	
 		
-		
-		
 
+	public static HashMap<Integer, ArrayList<Integer>> createInputsAndFormatsTestCollection() {
+		HashMap<Integer, ArrayList<Integer>> softwareIdToInputFormatIds =
+			new HashMap<Integer, ArrayList<Integer>>();
+
+		ArrayList<Integer> inputsAndFormats1000 = new ArrayList<Integer>();
+			inputsAndFormats1000.add(2);   	 //DF IDs.  One row for each input/data format
+			inputsAndFormats1000.add(3);
+		softwareIdToInputFormatIds.put(Integer.valueOf(1000), inputsAndFormats1000);
 		
+		ArrayList<Integer> inputsAndFormats1001 = new ArrayList<Integer>();
+			//inputsAndFormats.add(1);
+			inputsAndFormats1001.add(2);
+		softwareIdToInputFormatIds.put(Integer.valueOf(1001), inputsAndFormats1001);
+
+		ArrayList<Integer> inputsAndFormats1002 = new ArrayList<Integer>();
+			inputsAndFormats1002.add(5);
+			//inputsAndFormats.add(4);
+			//software.add(60);
+		softwareIdToInputFormatIds.put(Integer.valueOf(1002), inputsAndFormats1002);
+
+		ArrayList<Integer> inputsAndFormats2000 = new ArrayList<Integer>();
+			inputsAndFormats2000.add(3);
+			inputsAndFormats2000.add(4);
+			//software.add(60);
+		softwareIdToInputFormatIds.put(Integer.valueOf(2000), inputsAndFormats2000);
+
+		ArrayList<Integer> inputsAndFormats2001 = new ArrayList<Integer>();
+			inputsAndFormats2001.add(6);
+			//inputsAndFormats.add(4);
+			//software.add(60);
+		softwareIdToInputFormatIds.put(Integer.valueOf(2001), inputsAndFormats2001);
 		
+		ArrayList<Integer> inputsAndFormats2002 = new ArrayList<Integer>();
+			inputsAndFormats2002.add(3);
+			//inputsAndFormats.add(4);
+			//software.add(60);
+		softwareIdToInputFormatIds.put(Integer.valueOf(2002), inputsAndFormats2002);
+		
+		return softwareIdToInputFormatIds;
+	}
 		// *** DO NOT DELETE makeSoftwareNode uses this method ****
 		// Software are "declared" in this and the following method
 		// This method declares the inputs for each software
 		// Call this method with a software ID to get the data format for each of its inputs
 		// Limitations: Exactly 1 DF per input;  code handles ??? up to 2-input software
 		
-		public static ArrayList<Integer> getInputDataFormatsForSoftware(Integer softwareID){
-			ArrayList<Integer> inputsAndFormats = new ArrayList<Integer>();
-			switch(softwareID) {
-			case 1000: 	// Software 1000
-				inputsAndFormats.add(2);   	 //DF IDs.  One row for each input/data format
-				inputsAndFormats.add(3);
-				//inputsAndFormats.add(4);
-				break;
-			case 1001:
-				//inputsAndFormats.add(1);
-				inputsAndFormats.add(2);
-				//inputsAndFormats.add(3);
-				break;
-			case 1002:
-				inputsAndFormats.add(5);
-				//inputsAndFormats.add(4);
-				//software.add(60);
-				break;
-			case 2000:
-				inputsAndFormats.add(3);
-				inputsAndFormats.add(4);
-				//software.add(60);
-				break;
-			case 2001:
-				inputsAndFormats.add(6);
-				//inputsAndFormats.add(4);
-				//software.add(60);
-				break;
-			case 2002:
-				inputsAndFormats.add(3);
-				//inputsAndFormats.add(4);
-				//software.add(60);
-				break;
-			}
-				return inputsAndFormats;
+		public ArrayList<Integer> getInputDataFormatsForSoftware(Integer softwareID){
+			return this.inputsAndFormats.get(softwareID);
 		}
 		
+	
+	public static HashMap<Integer, ArrayList<Integer>> createOutputsAndFormatsTestCollection() {
+		HashMap<Integer, ArrayList<Integer>> softwareIdToOutputFormatIds =
+			new HashMap<Integer, ArrayList<Integer>>();
+
+		ArrayList<Integer> outputsAndFormats1000 = new ArrayList<Integer>();
+			outputsAndFormats1000.add(1);   //Data format ID.  One row for each output/data format
+			outputsAndFormats1000.add(6); // software 1000 has 2 outputs
+		softwareIdToOutputFormatIds.put(Integer.valueOf(1000), outputsAndFormats1000);
+
+		ArrayList<Integer> outputsAndFormats1001 = new ArrayList<Integer>();
+			outputsAndFormats1001.add(1);  /// need another format
+			outputsAndFormats1001.add(6);  // software 1001 has 2 outputs
+		softwareIdToOutputFormatIds.put(Integer.valueOf(1001), outputsAndFormats1001);
+
+		ArrayList<Integer> outputsAndFormats1002 = new ArrayList<Integer>();
+			outputsAndFormats1002.add(1);
+		softwareIdToOutputFormatIds.put(Integer.valueOf(1002), outputsAndFormats1002);
 		
+		ArrayList<Integer> outputsAndFormats2000 = new ArrayList<Integer>();
+			outputsAndFormats2000.add(2);
+		softwareIdToOutputFormatIds.put(Integer.valueOf(2000), outputsAndFormats2000);
+
+		ArrayList<Integer> outputsAndFormats2001 = new ArrayList<Integer>();
+			outputsAndFormats2001.add(1);
+		softwareIdToOutputFormatIds.put(Integer.valueOf(2001), outputsAndFormats2001);
+
+		ArrayList<Integer> outputsAndFormats2002 = new ArrayList<Integer>();
+		//	outputsAndFormats2002.add(2);
+		softwareIdToOutputFormatIds.put(Integer.valueOf(2002), outputsAndFormats2002);
+	
+		return softwareIdToOutputFormatIds;	
+	}
+
 		// *** DO NOT DELETE:  makeSoftwareNode uses this method ****
 		// GET RID OF THIS COMPLEXITY by creating the structure dynamically by calling the first method in this file
 		
@@ -151,31 +216,8 @@ public class SoftwareDatasetDataFormatRepository {
 		// MAKE SURE NO SOFTWARE HAS THE SAME INPUT AND OUTPUT FORMATS
 		// overloaded identifier conventions:  abcd  a-data format; d=makes identifier unique, given data format
 		
-		public static ArrayList<Integer> getOutputDataFormatsForSoftware(Integer softwareID){
-			ArrayList<Integer> outputsAndFormats = new ArrayList<Integer>();
-			switch(softwareID) {
-			case 1000: 	// Software ID
-				outputsAndFormats.add(1);   //Data format ID.  One row for each output/data format
-				outputsAndFormats.add(6); // software 1000 has 2 outputs
-				break;
-			case 1001:
-				outputsAndFormats.add(1);  /// need another format
-				outputsAndFormats.add(6);  // software 1001 has 2 outputs
-				break;
-			case 1002:
-				outputsAndFormats.add(1);
-				break;
-			case 2000:
-				outputsAndFormats.add(2);
-				break;
-			case 2001:
-				outputsAndFormats.add(1);
-				break;
-			case 2002:
-			//	outputsAndFormats.add(2);
-				break;
-			} 
-				return outputsAndFormats;
+		public ArrayList<Integer> getOutputDataFormatsForSoftware(Integer softwareID){
+			return this.outputsAndFormats.get(softwareID);
 		}
 		
 }

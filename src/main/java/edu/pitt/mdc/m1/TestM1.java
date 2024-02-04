@@ -1,4 +1,5 @@
 package edu.pitt.mdc.m1;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +23,12 @@ public class TestM1 {
 	public static void main(String args[]) throws CloneNotSupportedException
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
+		runOnTestCollection();
 
+		runOnMdcSmallSet();
+    }
+
+    public static void runOnTestCollection() throws CloneNotSupportedException {
 		ArrayList<DigitalResearchObject> dros = new ArrayList<DigitalResearchObject>();
 		Integer softwareId =1000, datasetId = 300;
 		Integer dataFormat = 1;
@@ -40,13 +46,15 @@ public class TestM1 {
 		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
 		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001,2002)); //2000 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
+		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
+		GenerateAndTestGuava.sddfr = sddfr;
 		while(iterSoftwareList.hasNext()) {
 			int softwareID = iterSoftwareList.next();
 			SoftwareNode s = new SoftwareNode(softwareID);
 
 			// get the info about software from the repository   get input ports and get output ports
-			ArrayList<Integer> inputs = SoftwareDatasetDataFormatRepository.getInputDataFormatsForSoftware(softwareID);
-			ArrayList<Integer> outputs = SoftwareDatasetDataFormatRepository.getOutputDataFormatsForSoftware(softwareID);
+			ArrayList<Integer> inputs = sddfr.getInputDataFormatsForSoftware(softwareID);
+			ArrayList<Integer> outputs = sddfr.getOutputDataFormatsForSoftware(softwareID);
 			Iterator<Integer> iterI = inputs.iterator();
 			Iterator<Integer> iterO = outputs.iterator();
 
@@ -100,18 +108,21 @@ public class TestM1 {
 			ndc.set(nc,++previousNc);
 
 		}
-	*/		
+	*/	
+	}
 
-	
+	public static void runOnMdcSmallSet() {
+		DatasetManager dm = loadDatasets("src/main/resources/mdc-datasets-small-set.json");
+		SoftwareManager sm = loadSoftware("src/main/resources/mdc-software-small-set.json");
+	}
 
-
-
-		// Bill's file reading code. It isn't being used at the moment, but isn't commented out either!
+	public static DatasetManager loadDatasets(String fileName) {
+		
 		ArrayList<DatasetNode> dsNodes = new ArrayList<>();
 
-		// creates the software and dataset repositories ??? are they hashed on data formats???
+		DatasetManager dm=null;
 		try {
-			FileReader fr = new FileReader("src/main/resources/dummy-datasets.json");
+			FileReader fr = new FileReader(fileName);
 			JsonReader jr = new JsonReader(fr);
 			JsonElement je = JsonParser.parseReader(jr);
 			Gson gs = new Gson();
@@ -124,21 +135,30 @@ public class TestM1 {
 					dsNodes.add(dn);
 				}
 			}
-			//System.out.println(dsNodes.size() + " datasets.");
-			//System.out.println("\tDEBUG: " + dsNodes.get(0).id + "\t" + dsNodes.get(0).name + "\t" + dsNodes.get(0).formatId);
-			DatasetManager dm = new DatasetManager(dsNodes);
-			Iterator<DatasetNode> i = dm.getDatasetsForFormatId(Integer.valueOf(1));
-			//System.out.println("DEBUG: Datasets for formatId=" + 1);
+			System.out.println(dsNodes.size() + " datasets.");
+			//System.out.println("\tDEBUG: " + dsNodes.get(0).id + "\t" + dsNodes.get(0).title + "\t" + dsNodes.get(0).formatId);
+			dm = new DatasetManager(dsNodes);
+			Iterator<DatasetNode> i = dm.getDatasetsForFormatId(Integer.valueOf(50));
+			System.out.println("DEBUG: Datasets for formatId=" + 50);
 			while (i.hasNext()) {
 				DatasetNode d = i.next();
-			//	System.out.println("\tDEBUG: " + d.id + "\t" + d.name + "\t" + d.formatId);
-			}
+				System.out.println("\tDEBUG: " + d.id + "\t" + d.title + "\t" + d.formatId);
+			}	
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
+
+		return dm;	
 	}
 
-	public static MutableValueGraph<Node, Integer>  makeDagClone(MutableValueGraph<Node, Integer>  g)
+ 	public static SoftwareManager loadSoftware(String fileName) {
+		File f = new File(fileName);
+		SoftwareManager sm = new SoftwareManager();
+		sm.loadFromJsonFile(f);
+		return sm;
+ 	}
+
+ 	public static MutableValueGraph<Node, Integer>  makeDagClone(MutableValueGraph<Node, Integer>  g)
 	{
 		MutableValueGraph<Node, Integer>  g1 = ValueGraphBuilder.directed().build();
 

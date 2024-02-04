@@ -9,13 +9,19 @@ public class DatasetManager {
 	HashMap<Integer, ArrayList<DatasetNode>> formatIdToDatasets;
 
 	public DatasetManager(ArrayList<DatasetNode> ds) {
-		this.ds = (ArrayList<DatasetNode>)ds.clone();
+		this.ds = new ArrayList<DatasetNode>();
+		for (DatasetNode dn : ds) {
+			if (dn != null)
+				this.ds.add(dn);
+		}
 		buildFormatMap();
 	}
 
 	protected void buildFormatMap() {
 		formatIdToDatasets = new HashMap<Integer, ArrayList<DatasetNode>>();
-		for (DatasetNode d : ds) {
+		//System.out.println("DEBUG: number of datasets is " + this.ds.size());
+		for (DatasetNode d : this.ds) {
+			//System.out.println("\tDEBUG: dataset node d is " + d);
 			int formatId = d.getFormatId();
 			int key = Integer.valueOf(formatId);
 			ArrayList<DatasetNode> dsForFormat;
