@@ -373,7 +373,7 @@ public class GenerateAndTestGuava {
 				else {
 					if(p.boundToObjectId < 1000) {
 						String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
-							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId);
+							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
 						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
 					} else {
 						text = sw;
