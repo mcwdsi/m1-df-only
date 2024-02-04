@@ -112,8 +112,30 @@ public class TestM1 {
 	}
 
 	public static void runOnMdcSmallSet() {
-		DatasetManager dm = loadDatasets("src/main/resources/mdc-datasets-small-set.json");
-		SoftwareManager sm = loadSoftware("src/main/resources/mdc-software-small-set.json");
+		DatasetManager dm = loadDatasets(
+			"src/main/resources/mdc-datasets-small-set.json");
+		SoftwareManager sm = loadSoftware(
+			"src/main/resources/mdc-software-small-set.json");
+		SoftwareDatasetDataFormatRepository sddfr = 
+			new SoftwareDatasetDataFormatRepository(dm, sm);
+
+		GenerateAndTestGuava.sddfr = sddfr;
+		GenerateAndTestGuava.sm = sm;
+		GenerateAndTestGuava.dm = dm;
+		Iterator<SoftwareNode> iterSoftwareList = sm.softwareNodeIterator();
+		while (iterSoftwareList.hasNext()) {
+			SoftwareNode s = iterSoftwareList.next();
+			int softwareID = s.uid;
+			String softwareTitle = s.title;
+			MutableValueGraph<Node, Integer> g = ValueGraphBuilder.directed().build();
+			g.addNode(s);
+			System.out.println("***********************************");
+			System.out.println("SOFTWARE " + softwareID + " (" + softwareTitle + ") is triggering M1 search:");
+			System.out.println("***********************************");
+			GenerateAndTestGuava.printGraph(g);
+			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
+			GenerateAndTestGuava.backSearch(g);
+		}
 	}
 
 	public static DatasetManager loadDatasets(String fileName) {
@@ -138,7 +160,7 @@ public class TestM1 {
 			System.out.println(dsNodes.size() + " datasets.");
 			//System.out.println("\tDEBUG: " + dsNodes.get(0).id + "\t" + dsNodes.get(0).title + "\t" + dsNodes.get(0).formatId);
 			dm = new DatasetManager(dsNodes);
-			Iterator<DatasetNode> i = dm.getDatasetsForFormatId(Integer.valueOf(50));
+			Iterator<DatasetNode> i = dm.getDatasetNodesForFormatId(Integer.valueOf(50));
 			System.out.println("DEBUG: Datasets for formatId=" + 50);
 			while (i.hasNext()) {
 				DatasetNode d = i.next();
@@ -170,6 +192,7 @@ public class TestM1 {
 		while (iter.hasNext() ) {
 			s = (SoftwareNode) iter.next();
 			s1 = new SoftwareNode(s.uid);  // constructor requires a uid and we want the graph to have the same software as the old!
+			s1.title = s.title;
 			
 			Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();
 			while(iterIP.hasNext()){

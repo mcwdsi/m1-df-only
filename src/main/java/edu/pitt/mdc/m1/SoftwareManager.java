@@ -23,6 +23,7 @@ public class SoftwareManager {
 		new HashMap<Integer, ArrayList<SoftwareNode>>();
 	HashMap<Integer, ArrayList<SoftwareNode>> softwareByOutputFormatId =
 		new HashMap<Integer, ArrayList<SoftwareNode>>();
+	HashMap<Integer, SoftwareNode> idToSoftwareNode;
 	
 	public void loadFromJsonFile(File f) {
 		try {
@@ -98,7 +99,9 @@ public class SoftwareManager {
 	}
 
 	protected void buildHashMaps() {
+		idToSoftwareNode = new HashMap<Integer, SoftwareNode>();
 		for (SoftwareNode sn : softwareNodes) {
+			idToSoftwareNode.put(sn.uid, sn);
 			for (SoftwarePort sp : sn.inputPorts) {
 				Integer formatId = sp.dataFormatID;
 				ArrayList<SoftwareNode> sForId;
@@ -123,5 +126,17 @@ public class SoftwareManager {
 				sForId.add(sn);
 			}
 		}
+	}
+
+	public Iterator<SoftwareNode> softwareNodeIterator() {
+		return softwareNodes.iterator();
+	}
+
+	public SoftwareNode getSoftwareNodeById(int softwareId) {
+		return idToSoftwareNode.get(softwareId);
+	}
+
+	public String getTitleForSoftware(int softwareId) {
+		return this.getSoftwareNodeById(softwareId).getTitle();
 	}
 }

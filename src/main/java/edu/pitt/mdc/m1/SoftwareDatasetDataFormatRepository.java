@@ -3,6 +3,7 @@ package edu.pitt.mdc.m1;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 public class SoftwareDatasetDataFormatRepository {
 	
@@ -21,10 +22,17 @@ public class SoftwareDatasetDataFormatRepository {
 		return testCollection;
 	}
 
-	// Given a data format, this method returns a heterogeneous list of datasets and software using that format.
-	// The returned software uses the data format for at least one OUTPUT
-	public SoftwareDatasetDataFormatRepository() {
+	private SoftwareDatasetDataFormatRepository() {
+	}
 
+	/*
+		TODO, update the constructor to take a DatasetManager and a SoftwareManager
+			and build the Hashes from there.
+	*/
+	public SoftwareDatasetDataFormatRepository(DatasetManager dm,
+		SoftwareManager sm) {
+		buildObjectList(dm, sm); //also builds outputsAndFormats
+		buildSoftwareList(sm);   //also builds inputsAndFormats
 	}
 
 	public static HashMap<Integer, ArrayList<DigitalResearchObject>> createObjectListTestCollection() {
@@ -73,7 +81,13 @@ public class SoftwareDatasetDataFormatRepository {
 		return formatToObjectList;
 	}
 
+	// Given a data format, this method returns a heterogeneous list of datasets and software using that format.
+	// The returned software uses the data format for at least one OUTPUT
 		public ArrayList<DigitalResearchObject> objectsByDataformat(Integer dataFormatID){
+			if (!this.objectList.containsKey(dataFormatID)) {
+				ArrayList<DigitalResearchObject> list = new ArrayList<DigitalResearchObject>();
+				this.objectList.put(dataFormatID, list);
+			}			
 			return this.objectList.get(dataFormatID);
 		}
 			
@@ -119,6 +133,10 @@ public class SoftwareDatasetDataFormatRepository {
 		// Software(String title, Integer softwareId, PortType portType, int portNumber)
 		
 		public ArrayList<Software> softwareByInputDataformat(Integer dataFormatID){
+			if (!this.softwareList.containsKey(dataFormatID)) {
+				ArrayList<Software> list = new ArrayList<Software>();
+				this.softwareList.put(dataFormatID, list);
+			}
 			return this.softwareList.get(dataFormatID);
 		}	
 		
@@ -219,5 +237,79 @@ public class SoftwareDatasetDataFormatRepository {
 		public ArrayList<Integer> getOutputDataFormatsForSoftware(Integer softwareID){
 			return this.outputsAndFormats.get(softwareID);
 		}
+
+	protected void buildObjectList(DatasetManager dm, SoftwareManager sm) {
+		this.objectList = new HashMap<Integer, ArrayList<DigitalResearchObject>>();
+		this.outputsAndFormats = new HashMap<Integer, ArrayList<Integer>>();
+
+		Set<Integer> datasetFormats = dm.getUniqueDataFormats();
+		for (int nextFormatId : datasetFormats) {
+			ArrayList<DigitalResearchObject> droList = 
+				new ArrayList<DigitalResearchObject>();
+			Iterator<Dataset> datasets = dm.getDatasetsForFormatId(nextFormatId);
+			while (datasets.hasNext()) {
+				Dataset d = datasets.next();
+				droList.add(d);
+			}
+			this.objectList.put(nextFormatId, droList);
+		}
+
+		Iterator<SoftwareNode> softwareNodes = sm.softwareNodeIterator();
+		while (softwareNodes.hasNext()) {
+			SoftwareNode sn = softwareNodes.next();
+			String title = sn.getTitle();
+			int id = sn.uid;
+
+			Iterator<SoftwarePort> outputs = sn.outputPorts.iterator();
+			int portNum = 0;
+			ArrayList<Integer> outputFormatIds = new ArrayList<Integer>();
+			while (outputs.hasNext()) {
+				SoftwarePort output = outputs.next();
+				int formatId = output.dataFormatID;
+				outputFormatIds.add(formatId);
+				Software s = new Software(title, id, PortType.OUTPUT, portNum++);
+				ArrayList<DigitalResearchObject> droList;
+				if (!this.objectList.containsKey(formatId)) {
+					droList = new ArrayList<DigitalResearchObject>();
+					this.objectList.put(formatId, droList);
+				} else {
+					droList = this.objectList.get(formatId);
+				}
+				droList.add(s);
+			}
+			this.outputsAndFormats.put(id, outputFormatIds);
+		}
+	}
+	
+	protected void buildSoftwareList(SoftwareManager sm) {
+		this.softwareList = new HashMap<Integer, ArrayList<Software>>();
+		this.inputsAndFormats = new HashMap<Integer, ArrayList<Integer>>();
 		
+		Iterator<SoftwareNode> softwareNodes = sm.softwareNodeIterator();
+		while (softwareNodes.hasNext()) {
+			SoftwareNode sn = softwareNodes.next();
+			String title = sn.getTitle();
+			int id = sn.uid;
+
+			Iterator<SoftwarePort> inputs = sn.inputPorts.iterator();
+			int portNum = 0;
+			ArrayList<Integer> inputFormatList = new ArrayList<Integer>();
+			while (inputs.hasNext()) {
+				SoftwarePort input = inputs.next();
+				int formatId = input.dataFormatID;
+				inputFormatList.add(formatId);
+				Software s = new Software(title, id, PortType.INPUT, portNum++);
+				ArrayList<Software> sList;
+				if (!this.softwareList.containsKey(formatId)) {
+					sList = new ArrayList<Software>();
+					this.softwareList.put(formatId, sList);
+				} else {
+					sList = this.softwareList.get(formatId);
+				}
+				sList.add(s);
+			}
+
+			inputsAndFormats.put(id, inputFormatList);
+		}
+	}		
 }

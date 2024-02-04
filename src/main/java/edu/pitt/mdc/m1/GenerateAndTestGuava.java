@@ -5,7 +5,9 @@ import com.google.common.graph.Graphs;
 
 public class GenerateAndTestGuava {
 
-	static SoftwareDatasetDataFormatRepository sddfr = new SoftwareDatasetDataFormatRepository();
+	static SoftwareDatasetDataFormatRepository sddfr;
+	static SoftwareManager sm = null;
+	static DatasetManager dm = null;
 
 	// gList accumulates the graphs composed by M1
 	static ArrayList<MutableValueGraph<Node, Integer>> gList = null;
@@ -361,19 +363,25 @@ public class GenerateAndTestGuava {
 			s = (SoftwareNode) iter.next();
 			Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
 			Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
-			System.out.println(" Software " + s.uid);
+			String softwareInfo = s.uid + " (" + s.title + ")";
+			System.out.println(" Software " + softwareInfo);
 			
 			while (iterIp.hasNext())  {
 				SoftwarePort p = iterIp.next();
 				if (p.boundToObjectId==0)
 					System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
 				else {
-					if(p.boundToObjectId < 1000) 
-						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + p.boundToObjectId ); 	
-					else {text = sw;
-					System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+					if(p.boundToObjectId < 1000) {
+						String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
+							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId);
+						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
+					} else {
+						text = sw;
+						String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+							Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
+						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
 					}
-					}
+				}
 			}
 	        if(!iterOp.hasNext()) System.out.println("    Output ports: none"); 	
 
@@ -395,6 +403,9 @@ public class GenerateAndTestGuava {
 	
 	public static SoftwareNode makeSoftwareNode(Integer softwareID) {
 		SoftwareNode sn  = new SoftwareNode(softwareID);
+		if (sm != null) {
+			sn.title = sm.getTitleForSoftware(softwareID);
+		}
 		//get the input ports for the software and add them to the SoftwareNode
 		Iterator<Integer> iterI = sddfr.getInputDataFormatsForSoftware(softwareID).iterator();
 		Integer portID =0;   // more accurate to say that input ports are numbered from 0 within each software.
