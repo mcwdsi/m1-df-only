@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -113,7 +114,13 @@ public class TestM1 {
 			graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
 			graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(17)));
 			System.out.println("Number of unique graph strings: " + graphStringSet.size());
-
+		
+			System.out.println("BEGIN GRAPH STRING SET");
+			ArrayList<String> graphStringsAsList = new ArrayList<String>();
+			graphStringsAsList.addAll(graphStringSet);
+			Collections.sort(graphStringsAsList);
+			for (String gs : graphStringsAsList) { System.out.println(gs); }
+			System.out.println("END GRAPH STRING SET");
 		}
 
 	/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
@@ -181,6 +188,13 @@ public class TestM1 {
 		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
 		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(37)));
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
+
+			System.out.println("BEGIN GRAPH STRING SET");
+			ArrayList<String> graphStringsAsList = new ArrayList<String>();
+			graphStringsAsList.addAll(graphStringSet);
+			Collections.sort(graphStringsAsList);
+			for (String gs : graphStringsAsList) { System.out.println(gs); }
+			System.out.println("END GRAPH STRING SET");
 	}
 
 	public static DatasetManager loadDatasets(String fileName) {
