@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
+import com.google.common.graph.ElementOrder;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.google.gson.Gson;
@@ -82,6 +84,36 @@ public class TestM1 {
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
 			GenerateAndTestGuava.backSearch(g);
 
+			System.out.println("Number of graphs generated: " + GenerateAndTestGuava.gList.size());
+			HashSet<String> graphStringSet = new HashSet<String>();
+			for (MutableValueGraph<Node, Integer> gi : GenerateAndTestGuava.gList) {
+				String canonicalGraphString = GenerateAndTestGuava.graphToString(gi);
+				String nonCanonicalGraphString = GenerateAndTestGuava.graphToStringNonStrictOrdering(gi);
+				if (graphStringSet.contains(canonicalGraphString)) {
+					System.out.println("*******************************");
+					System.out.println("* CANONICAL GRAPH STRING ******");
+					System.out.println("*******************************");
+					System.out.println(canonicalGraphString);
+					System.out.println("****************************");
+
+					System.out.println("*******************************");
+					System.out.println("* NON-CANONICAL GRAPH STRING **");
+					System.out.println("*******************************");
+					System.out.println(nonCanonicalGraphString);
+					System.out.println("****************************");
+					System.out.println();
+				}
+				graphStringSet.add(canonicalGraphString);
+			}
+			System.out.println("Number of unique graph strings: " + graphStringSet.size());
+
+			/*
+				Double check to make sure that we cannot force duplicates into the mix.
+			*/
+			graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
+			graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(17)));
+			System.out.println("Number of unique graph strings: " + graphStringSet.size());
+
 		}
 
 	/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
@@ -119,6 +151,7 @@ public class TestM1 {
 		SoftwareDatasetDataFormatRepository sddfr = 
 			new SoftwareDatasetDataFormatRepository(dm, sm);
 
+		GenerateAndTestGuava.gList = null;
 		GenerateAndTestGuava.sddfr = sddfr;
 		GenerateAndTestGuava.sm = sm;
 		GenerateAndTestGuava.dm = dm;
@@ -136,6 +169,18 @@ public class TestM1 {
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
 			GenerateAndTestGuava.backSearch(g);
 		}
+
+		System.out.println("Number of graphs generated: " + GenerateAndTestGuava.gList.size());
+		HashSet<String> graphStringSet = new HashSet<String>();
+		for (MutableValueGraph<Node, Integer> gi : GenerateAndTestGuava.gList) {
+			graphStringSet.add(GenerateAndTestGuava.graphToString(gi));
+		}
+		/*
+		*	Try to force a duplicate or two
+		*/
+		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
+		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(37)));
+		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 	}
 
 	public static DatasetManager loadDatasets(String fileName) {

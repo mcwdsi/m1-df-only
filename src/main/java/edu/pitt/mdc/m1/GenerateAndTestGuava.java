@@ -394,6 +394,104 @@ public class GenerateAndTestGuava {
 			}
 		} 
 	}
+
+	public static String graphToString(MutableValueGraph<Node, Integer> g){
+
+		StringBuilder sb = new StringBuilder();
+
+		ArrayList<Node> nodeList = new ArrayList<Node>();
+		nodeList.addAll(g.nodes());
+		Collections.sort(nodeList);
+		
+		Iterator<Node> iter = nodeList.iterator();
+		SoftwareNode s;
+		String sw = new String("software ");
+		String ds = new String("dataset ");
+		String text;
+
+		while (iter.hasNext()) {  
+			s = (SoftwareNode) iter.next();
+			Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
+			Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
+			String softwareInfo = s.uid + " (" + s.title + ")";
+			sb.append(" Software " + softwareInfo);
+			
+			while (iterIp.hasNext())  {
+				SoftwarePort p = iterIp.next();
+				if (p.boundToObjectId==0)
+					sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+				else {
+					if(p.boundToObjectId < 1000) {
+						String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
+							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
+						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
+					} else {
+						text = sw;
+						String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+							Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
+						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+					}
+				}
+			}
+	        if(!iterOp.hasNext()) sb.append("    Output ports: none"); 	
+
+			while (iterOp.hasNext()) { 
+				SoftwarePort p = iterOp.next();
+				if (p.boundToObjectId==0)
+					sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+				else
+					sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 						
+			}
+		} 
+		return sb.toString();
+	}
+
+	public static String graphToStringNonStrictOrdering(MutableValueGraph<Node, Integer> g){
+
+		StringBuilder sb = new StringBuilder();
+
+		Iterator<Node> iter = g.nodes().iterator();
+		SoftwareNode s;
+		String sw = new String("software ");
+		String ds = new String("dataset ");
+		String text;
+
+		while (iter.hasNext()) {  
+			s = (SoftwareNode) iter.next();
+			Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
+			Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
+			String softwareInfo = s.uid + " (" + s.title + ")";
+			sb.append(" Software " + softwareInfo);
+			
+			while (iterIp.hasNext())  {
+				SoftwarePort p = iterIp.next();
+				if (p.boundToObjectId==0)
+					sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+				else {
+					if(p.boundToObjectId < 1000) {
+						String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
+							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
+						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
+					} else {
+						text = sw;
+						String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+							Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
+						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+					}
+				}
+			}
+	        if(!iterOp.hasNext()) sb.append("    Output ports: none"); 	
+
+			while (iterOp.hasNext()) { 
+				SoftwarePort p = iterOp.next();
+				if (p.boundToObjectId==0)
+					sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+				else
+					sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 						
+			}
+		} 
+		return sb.toString();
+	}
 	
 	public static ArrayList<MutableValueGraph<Node, Integer>> getGraphList() {
 		return gList;
