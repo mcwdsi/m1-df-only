@@ -203,7 +203,7 @@ public class SoftwareDatasetDataFormatRepository {
 
 		ArrayList<Integer> outputsAndFormats1001 = new ArrayList<Integer>();
 			outputsAndFormats1001.add(1);  /// need another format
-			outputsAndFormats1001.add(6);  // software 1001 has 2 outputs
+			//outputsAndFormats1001.add(6);  // software 1001 has 2 outputs
 		softwareIdToOutputFormatIds.put(Integer.valueOf(1001), outputsAndFormats1001);
 
 		ArrayList<Integer> outputsAndFormats1002 = new ArrayList<Integer>();
