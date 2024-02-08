@@ -3,7 +3,7 @@ import java.util.*;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.Graphs;
 
-public class GenerateAndTestGuava {
+public class GenerateAndTest {
 
 	static SoftwareDatasetDataFormatRepository sddfr;
 	static SoftwareManager sm = null;
@@ -124,7 +124,6 @@ public class GenerateAndTestGuava {
 	    	numUnboundInputs++;
 			oneDfMatchingInputObjectList = sddfr.objectsByDataformat(dataFormatID); // returns list of datasets w/ dataFormatID and software w/ dataFormatID for output
 			if (oneDfMatchingInputObjectList.isEmpty()) {
-			   System.out.println("\n FYI: exiting backsearch (returns FALSE) due to zero DF-matching instantiations of an unbound input port for this graph! \n"); 
 			   return false;
 			} else
 			dfMatchingInputObjectLists.add(oneDfMatchingInputObjectList);
@@ -355,9 +354,7 @@ public class GenerateAndTestGuava {
 		
 		Iterator<Node> iter = g.nodes().iterator(); // generalize at some point to printing graphs with DatasetNode and perhaps any Node
 		SoftwareNode s;
-		String sw = new String("software ");
-		String ds = new String("dataset ");
-		String text;
+
 
 		while (iter.hasNext()) {  
 			s = (SoftwareNode) iter.next();
@@ -376,10 +373,10 @@ public class GenerateAndTestGuava {
 							Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
 						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
 					} else {
-						text = sw;
+			
 						String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
 							Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
-						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+						System.out.println("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
 					}
 				}
 			}

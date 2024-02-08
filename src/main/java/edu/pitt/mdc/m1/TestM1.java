@@ -50,7 +50,7 @@ public class TestM1 {
 		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001,2002)); //2000 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
-		GenerateAndTestGuava.sddfr = sddfr;
+		GenerateAndTest.sddfr = sddfr;
 		while(iterSoftwareList.hasNext()) {
 			int softwareID = iterSoftwareList.next();
 			SoftwareNode s = new SoftwareNode(softwareID);
@@ -81,18 +81,18 @@ public class TestM1 {
 			System.out.println("***********************************");
 			System.out.println("SOFTWARE " + softwareID + " is triggering M1 search:");
 			System.out.println("***********************************");
-			GenerateAndTestGuava.printGraph(g);
+			GenerateAndTest.printGraph(g);
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			GenerateAndTestGuava.backSearch(g);
+			GenerateAndTest.backSearch(g);
 
 
 		}
 
-		System.out.println("Number of graphs generated: " + GenerateAndTestGuava.gList.size());
+		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 		HashSet<String> graphStringSet = new HashSet<String>();
-		for (MutableValueGraph<Node, Integer> gi : GenerateAndTestGuava.gList) {
-			String canonicalGraphString = GenerateAndTestGuava.graphToString(gi);
-			String nonCanonicalGraphString = GenerateAndTestGuava.graphToStringNonStrictOrdering(gi);
+		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
+			String canonicalGraphString = GenerateAndTest.graphToString(gi);
+			String nonCanonicalGraphString = GenerateAndTest.graphToStringNonStrictOrdering(gi);
 			if (graphStringSet.contains(canonicalGraphString)) {
 				System.out.println("*******************************");
 				System.out.println("* CANONICAL GRAPH STRING ******");
@@ -112,8 +112,8 @@ public class TestM1 {
 		/*
 			Double check to make sure that we cannot force duplicates into the mix.
 		*/
-		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
-		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(17)));
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(10)));
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(17)));
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 	
 		System.out.println("BEGIN GRAPH STRING SET");
@@ -158,10 +158,10 @@ public class TestM1 {
 		SoftwareDatasetDataFormatRepository sddfr = 
 			new SoftwareDatasetDataFormatRepository(dm, sm);
 
-		GenerateAndTestGuava.gList = null;
-		GenerateAndTestGuava.sddfr = sddfr;
-		GenerateAndTestGuava.sm = sm;
-		GenerateAndTestGuava.dm = dm;
+		GenerateAndTest.gList = null;
+		GenerateAndTest.sddfr = sddfr;
+		GenerateAndTest.sm = sm;
+		GenerateAndTest.dm = dm;
 		Iterator<SoftwareNode> iterSoftwareList = sm.softwareNodeIterator();
 		while (iterSoftwareList.hasNext()) {
 			SoftwareNode s = iterSoftwareList.next();
@@ -172,21 +172,21 @@ public class TestM1 {
 			System.out.println("***********************************");
 			System.out.println("SOFTWARE " + softwareID + " (" + softwareTitle + ") is triggering M1 search:");
 			System.out.println("***********************************");
-			GenerateAndTestGuava.printGraph(g);
+			GenerateAndTest.printGraph(g);
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			GenerateAndTestGuava.backSearch(g);
+			GenerateAndTest.backSearch(g);
 		}
 
-		System.out.println("Number of graphs generated: " + GenerateAndTestGuava.gList.size());
+		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 		HashSet<String> graphStringSet = new HashSet<String>();
-		for (MutableValueGraph<Node, Integer> gi : GenerateAndTestGuava.gList) {
-			graphStringSet.add(GenerateAndTestGuava.graphToString(gi));
+		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
+			graphStringSet.add(GenerateAndTest.graphToString(gi));
 		}
 		/*
 		*	Try to force a duplicate or two
 		*/
-		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(10)));
-		graphStringSet.add(GenerateAndTestGuava.graphToString(GenerateAndTestGuava.gList.get(37)));
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(10)));
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(37)));
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
 			System.out.println("BEGIN GRAPH STRING SET");
