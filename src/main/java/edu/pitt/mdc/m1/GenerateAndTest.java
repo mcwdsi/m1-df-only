@@ -2,6 +2,7 @@ package edu.pitt.mdc.m1;
 import java.util.*; 
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.Graphs;
+import com.google.common.graph.ValueGraphBuilder;
 
 public class GenerateAndTest {
 
@@ -62,7 +63,7 @@ public class GenerateAndTest {
 		    		Software matchingSoftware = iterMS.next();
 		    		
 		    		// first order of business is making a clone copy of the graph
-		    		MutableValueGraph<Node, Integer> g1 = TestM1.makeDagClone(g);    
+		    		MutableValueGraph<Node, Integer> g1 = makeDagClone(g);    
 
 		    		// get the unbound software in g1 and "bind" it to the matching software
 	    			
@@ -285,7 +286,7 @@ public class GenerateAndTest {
 	// You can find the instance in the obectToBindTo element of UnboundGraphInput.
 	public static void extendAndPrintGraph(MutableValueGraph<Node, Integer> g, ArrayList<UnboundGraphInput> unboundGraphInputs){
 		// Make a deep copy of the graph. "Bind" datasets to input ports. Make SoftwareNode(s) and bind them to software ports.
-		MutableValueGraph<Node, Integer> g1 = TestM1.makeDagClone(g);    
+		MutableValueGraph<Node, Integer> g1 = makeDagClone(g);    
 
 		Iterator<UnboundGraphInput> unboundGraphInputIterator = unboundGraphInputs.iterator();
 		UnboundGraphInput ugi;
@@ -392,8 +393,7 @@ public class GenerateAndTest {
 		} 
 	}
 
-	public static String graphToString(MutableValueGraph<Node, Integer> g){
-
+	public static String graphToString(MutableValueGraph<Node, Integer> g) {
 		StringBuilder sb = new StringBuilder();
 
 		ArrayList<Node> nodeList = new ArrayList<Node>();
@@ -443,8 +443,7 @@ public class GenerateAndTest {
 		return sb.toString();
 	}
 
-	public static String graphToStringNonStrictOrdering(MutableValueGraph<Node, Integer> g){
-
+	public static String graphToStringNonStrictOrdering(MutableValueGraph<Node, Integer> g) {
 		StringBuilder sb = new StringBuilder();
 
 		Iterator<Node> iter = g.nodes().iterator();
@@ -493,8 +492,6 @@ public class GenerateAndTest {
 	public static ArrayList<MutableValueGraph<Node, Integer>> getGraphList() {
 		return gList;
 	}
-
-	
 	
 	public static SoftwareNode makeSoftwareNode(Integer softwareID) {
 		SoftwareNode sn  = new SoftwareNode(softwareID);
@@ -519,7 +516,48 @@ public class GenerateAndTest {
 		}
 		return sn;
 	}
+
+ 	public static MutableValueGraph<Node, Integer>  makeDagClone(MutableValueGraph<Node, Integer>  g) {
+		MutableValueGraph<Node, Integer>  g1 = ValueGraphBuilder.directed().build();
+
+		//make copies of all SoftwareNode and Ports in g
+		SoftwareNode s, s1;
+		SoftwarePort ip, ip1, op, op1;
 		
+		Iterator<Node> iter = g.nodes().iterator();
+		while (iter.hasNext() ) {
+			s = (SoftwareNode) iter.next();
+			s1 = new SoftwareNode(s.uid);  // constructor requires a uid and we want the graph to have the same software as the old!
+			s1.title = s.title;
+			
+			Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();
+			while(iterIP.hasNext()){
+				ip = iterIP.next();
+				ip1 = new SoftwarePort(ip.softwareID, ip.type, ip.dataFormatID);
+				
+				ip1.setPortId(ip.getPortId());
+				ip1.setBoundToObjectId(ip.getBoundToObjectId());				
+				ip1.setBoundToSoftwarePortArrayIndex(ip.getBoundToSoftwarePortArrayIndex());
+				
+				s1.inputPorts.add(ip1);
+			}
+			int portCtr = 0;
+			Iterator<SoftwarePort> iterOP = s.outputPorts.iterator();
+			while(iterOP.hasNext()){
+				op = iterOP.next();
+				op1 = new SoftwarePort(op.softwareID, op.type, op.dataFormatID);
+				
+				op1.setPortId(op.getPortId());
+				op1.setBoundToObjectId(op.getBoundToObjectId());				
+				op1.setBoundToSoftwarePortArrayIndex(op.getBoundToSoftwarePortArrayIndex());
+				
+				s1.outputPorts.add(op1);
+			}
+			g1.addNode(s1);
+		}
+		return g1;
+	}
+
 }
 
 	
