@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 
 import com.google.common.graph.ElementOrder;
 import com.google.common.graph.MutableValueGraph;
@@ -18,34 +19,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
-//test comment
-// at the moment, this routine only tests M1-data-format-only search triggered by one new software (ID 1000)
-// Must loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
+
 public class TestM1 {
 
 	public static void main(String args[]) throws CloneNotSupportedException
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
-
-		runOnMdcSmallSet();
+		runOnMdcSubset("small-set");
+		runOnMdcSubset("restricted");
+		//runOnMdcSubset("limited");
     }
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
-		ArrayList<DigitalResearchObject> dros = new ArrayList<DigitalResearchObject>();
-		Integer softwareId =1000, datasetId = 300;
-		Integer dataFormat = 1;
-		int portNumber = 0;
-		String softwareTitle = "Software X", datasetTitle = "Dataset Y";
-		Software op = new Software(softwareTitle, softwareId, PortType.INPUT, portNumber);
-		Dataset ds = new Dataset(datasetTitle, datasetId, dataFormat);
-		dros.add(ds);
-		dros.add(op);
-		HashMap <Integer, ArrayList<DigitalResearchObject>> hm = new HashMap <Integer, ArrayList<DigitalResearchObject>
-		>();
-		hm.put(1000, dros);
-		dros = hm.get(1000);
-		
 		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
 		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001,2002)); //2000 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
@@ -150,11 +136,11 @@ public class TestM1 {
 	*/	
 	}
 
-	public static void runOnMdcSmallSet() {
+	public static void runOnMdcSubset(String subsetName) {
 		DatasetManager dm = loadDatasets(
-			"src/main/resources/mdc-datasets-small-set.json");
+			"src/main/resources/mdc-datasets-" + subsetName + ".json");
 		SoftwareManager sm = loadSoftware(
-			"src/main/resources/mdc-software-small-set.json");
+			"src/main/resources/mdc-software-" + subsetName + ".json");
 		SoftwareDatasetDataFormatRepository sddfr = 
 			new SoftwareDatasetDataFormatRepository(dm, sm);
 
@@ -185,8 +171,11 @@ public class TestM1 {
 		/*
 		*	Try to force a duplicate or two
 		*/
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(10)));
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(37)));
+		Random rnd = new Random();
+		int dup1 = rnd.nextInt(GenerateAndTest.gList.size());
+		int dup2 = rnd.nextInt(GenerateAndTest.gList.size());
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(dup1)));
+		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(dup2)));
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
 			System.out.println("BEGIN GRAPH STRING SET");
@@ -239,45 +228,4 @@ public class TestM1 {
 		return sm;
  	}
 
- 	public static MutableValueGraph<Node, Integer>  makeDagClone(MutableValueGraph<Node, Integer>  g)
-	{
-		MutableValueGraph<Node, Integer>  g1 = ValueGraphBuilder.directed().build();
-
-		//make copies of all SoftwareNode and Ports in g
-		SoftwareNode s, s1;
-		SoftwarePort ip, ip1, op, op1;
-		
-		Iterator<Node> iter = g.nodes().iterator();
-		while (iter.hasNext() ) {
-			s = (SoftwareNode) iter.next();
-			s1 = new SoftwareNode(s.uid);  // constructor requires a uid and we want the graph to have the same software as the old!
-			s1.title = s.title;
-			
-			Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();
-			while(iterIP.hasNext()){
-				ip = iterIP.next();
-				ip1 = new SoftwarePort(ip.softwareID, ip.type, ip.dataFormatID);
-				
-				ip1.setPortId(ip.getPortId());
-				ip1.setBoundToObjectId(ip.getBoundToObjectId());				
-				ip1.setBoundToSoftwarePortArrayIndex(ip.getBoundToSoftwarePortArrayIndex());
-				
-				s1.inputPorts.add(ip1);
-			}
-			int portCtr = 0;
-			Iterator<SoftwarePort> iterOP = s.outputPorts.iterator();
-			while(iterOP.hasNext()){
-				op = iterOP.next();
-				op1 = new SoftwarePort(op.softwareID, op.type, op.dataFormatID);
-				
-				op1.setPortId(op.getPortId());
-				op1.setBoundToObjectId(op.getBoundToObjectId());				
-				op1.setBoundToSoftwarePortArrayIndex(op.getBoundToSoftwarePortArrayIndex());
-				
-				s1.outputPorts.add(op1);
-			}
-			g1.addNode(s1);
-		}
-		return g1;
-	}
 }
