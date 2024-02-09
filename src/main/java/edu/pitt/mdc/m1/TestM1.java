@@ -28,7 +28,7 @@ public class TestM1 {
 		runOnTestCollection();
 		runOnMdcSubset("small-set");
 		runOnMdcSubset("restricted");
-		//runOnMdcSubset("limited");
+		runOnMdcSubset("limited");
     }
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
@@ -78,30 +78,10 @@ public class TestM1 {
 		HashSet<String> graphStringSet = new HashSet<String>();
 		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
 			String canonicalGraphString = GenerateAndTest.graphToString(gi);
-			String nonCanonicalGraphString = GenerateAndTest.graphToStringNonStrictOrdering(gi);
-			if (graphStringSet.contains(canonicalGraphString)) {
-				System.out.println("*******************************");
-				System.out.println("* CANONICAL GRAPH STRING ******");
-				System.out.println("*******************************");
-				System.out.println(canonicalGraphString);
-				System.out.println("****************************");
-				System.out.println("*******************************");
-				System.out.println("* NON-CANONICAL GRAPH STRING **");
-				System.out.println("*******************************");
-				System.out.println(nonCanonicalGraphString);
-				System.out.println("****************************");
-				System.out.println();
-			}
 			graphStringSet.add(canonicalGraphString);
 		}
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
-		/*
-			Double check to make sure that we cannot force duplicates into the mix.
-		*/
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(10)));
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(17)));
-		System.out.println("Number of unique graph strings: " + graphStringSet.size());
-	
+		
 		System.out.println("BEGIN GRAPH STRING SET");
 		ArrayList<String> graphStringsAsList = new ArrayList<String>();
 		graphStringsAsList.addAll(graphStringSet);
@@ -168,14 +148,7 @@ public class TestM1 {
 		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
 			graphStringSet.add(GenerateAndTest.graphToString(gi));
 		}
-		/*
-		*	Try to force a duplicate or two
-		*/
-		Random rnd = new Random();
-		int dup1 = rnd.nextInt(GenerateAndTest.gList.size());
-		int dup2 = rnd.nextInt(GenerateAndTest.gList.size());
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(dup1)));
-		graphStringSet.add(GenerateAndTest.graphToString(GenerateAndTest.gList.get(dup2)));
+	
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
 			System.out.println("BEGIN GRAPH STRING SET");
@@ -205,15 +178,17 @@ public class TestM1 {
 					dsNodes.add(dn);
 				}
 			}
-			System.out.println(dsNodes.size() + " datasets.");
+			//System.out.println(dsNodes.size() + " datasets.");
 			//System.out.println("\tDEBUG: " + dsNodes.get(0).id + "\t" + dsNodes.get(0).title + "\t" + dsNodes.get(0).formatId);
 			dm = new DatasetManager(dsNodes);
+			/*
 			Iterator<DatasetNode> i = dm.getDatasetNodesForFormatId(Integer.valueOf(50));
 			System.out.println("DEBUG: Datasets for formatId=" + 50);
 			while (i.hasNext()) {
 				DatasetNode d = i.next();
 				System.out.println("\tDEBUG: " + d.id + "\t" + d.title + "\t" + d.formatId);
-			}	
+			}
+			*/	
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -226,6 +201,10 @@ public class TestM1 {
 		SoftwareManager sm = new SoftwareManager();
 		sm.loadFromJsonFile(f);
 		return sm;
+ 	}
+
+ 	public static generateSummaryStatistics(ArrayList<MutableValueGraph<Node, Integer>> gList) {
+
  	}
 
 }
