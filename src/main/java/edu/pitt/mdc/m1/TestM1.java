@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.common.graph.ElementOrder;
 import com.google.common.graph.MutableValueGraph;
@@ -76,18 +77,25 @@ public class TestM1 {
 
 		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 		HashSet<String> graphStringSet = new HashSet<String>();
+		ArrayList<MutableValueGraph<Node, Integer>> gListDeDuplicated = 
+			new ArrayList<MutableValueGraph<Node, Integer>>();
 		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
-			String canonicalGraphString = GenerateAndTest.graphToString(gi);
-			graphStringSet.add(canonicalGraphString);
+			boolean added = graphStringSet.add(GenerateAndTest.graphToString(gi));
+			//System.out.println(added);
+			if (added)
+				gListDeDuplicated.add(gi);
 		}
+	
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
-		
+
 		System.out.println("BEGIN GRAPH STRING SET");
 		ArrayList<String> graphStringsAsList = new ArrayList<String>();
 		graphStringsAsList.addAll(graphStringSet);
 		Collections.sort(graphStringsAsList);
-		for (String gs : graphStringsAsList) { System.out.println(gs); }
+		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
 		System.out.println("END GRAPH STRING SET");
+
+		generateSummaryStatistics(gListDeDuplicated);
 		
 		/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
 		ArrayList<MutableValueGraph<Node, Integer>> gList;
@@ -145,18 +153,25 @@ public class TestM1 {
 
 		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 		HashSet<String> graphStringSet = new HashSet<String>();
+		ArrayList<MutableValueGraph<Node, Integer>> gListDeDuplicated = 
+			new ArrayList<MutableValueGraph<Node, Integer>>();
 		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
-			graphStringSet.add(GenerateAndTest.graphToString(gi));
+			boolean added = graphStringSet.add(GenerateAndTest.graphToString(gi));
+			//System.out.println(added);
+			if (added)
+				gListDeDuplicated.add(gi);
 		}
 	
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
-			System.out.println("BEGIN GRAPH STRING SET");
-			ArrayList<String> graphStringsAsList = new ArrayList<String>();
-			graphStringsAsList.addAll(graphStringSet);
-			Collections.sort(graphStringsAsList);
-			for (String gs : graphStringsAsList) { System.out.println(gs); }
-			System.out.println("END GRAPH STRING SET");
+		System.out.println("BEGIN GRAPH STRING SET");
+		ArrayList<String> graphStringsAsList = new ArrayList<String>();
+		graphStringsAsList.addAll(graphStringSet);
+		Collections.sort(graphStringsAsList);
+		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
+		System.out.println("END GRAPH STRING SET");
+
+		generateSummaryStatistics(gListDeDuplicated);
 	}
 
 	public static DatasetManager loadDatasets(String fileName) {
@@ -203,8 +218,43 @@ public class TestM1 {
 		return sm;
  	}
 
- 	public static generateSummaryStatistics(ArrayList<MutableValueGraph<Node, Integer>> gList) {
+ 	public static void generateSummaryStatistics(ArrayList<MutableValueGraph<Node, Integer>> gList) {
+ 		HashSet<Integer> uniqueSoftwareIds = new HashSet<Integer>();
+ 		HashMap<Integer, Integer> numberOfNodesToNumberOfGraphs = new HashMap<Integer, Integer>();
 
+ 		for (MutableValueGraph<Node, Integer> g: gList) {
+ 			Integer numNodes = g.nodes().size();
+ 			if (numberOfNodesToNumberOfGraphs.containsKey(numNodes)) {
+ 				Integer numGraphs = numberOfNodesToNumberOfGraphs.get(numNodes);
+ 				numGraphs++;
+ 				numberOfNodesToNumberOfGraphs.put(numNodes, numGraphs);
+ 			} else {
+ 				numberOfNodesToNumberOfGraphs.put(numNodes, Integer.valueOf(1));
+ 			}
+
+ 			Iterator<Node> nodeIter = g.nodes().iterator();
+ 			while(nodeIter.hasNext()) {
+ 				Node n = nodeIter.next();
+ 				SoftwareNode sn = (SoftwareNode)n;
+ 				uniqueSoftwareIds.add(sn.uid);
+ 			}
+ 		}
+
+ 		System.out.print("Ids of unique software across all graphs:\n\t");
+ 		for (Integer id : uniqueSoftwareIds) {
+ 			System.out.print(id + ", ");
+ 		}
+ 		System.out.println();
+
+
+ 		Set<Integer> numNodeSet = numberOfNodesToNumberOfGraphs.keySet();
+ 		ArrayList<Integer> numNodeList = new ArrayList<Integer>();
+ 		numNodeList.addAll(numNodeSet);
+ 		Collections.sort(numNodeList);
+ 		for (Integer i : numNodeList) {
+ 			Integer numGraphs = numberOfNodesToNumberOfGraphs.get(i);
+ 			System.out.println("There are " + numGraphs + " graphs with " + i + " nodes.");
+ 		}
  	}
 
 }
