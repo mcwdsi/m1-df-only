@@ -73,9 +73,13 @@ public class SoftwareManager {
 			JsonPrimitive numAsJp = inputJo.getAsJsonPrimitive("number");
 			JsonArray formatsAsJa = inputJo.getAsJsonArray("formatIds");
 			Iterator<JsonElement> j = formatsAsJa.iterator();
-			JsonElement firstFormatAsJe = j.next();
-			int formatId = firstFormatAsJe.getAsInt();
-			SoftwarePort sp = new SoftwarePort(softwareId, PortType.INPUT, formatId);
+			ArrayList<Integer> formatIds = new ArrayList<Integer>();
+			while (j.hasNext()) {
+				JsonElement nextFormat = j.next();
+				int formatId = nextFormat.getAsInt();
+				formatIds.add(formatId);
+			}
+			SoftwarePort sp = new SoftwarePort(softwareId, PortType.INPUT, formatIds);
 			int portNumber = numAsJp.getAsInt();
 			sp.setPortId(portNumber-1);
 			inputPorts.add(sp);
@@ -92,9 +96,13 @@ public class SoftwareManager {
 			JsonPrimitive numAsJp = inputJo.getAsJsonPrimitive("number");
 			JsonArray formatsAsJa = inputJo.getAsJsonArray("formatIds");
 			Iterator<JsonElement> j = formatsAsJa.iterator();
-			JsonElement firstFormatAsJe = j.next();
-			int formatId = firstFormatAsJe.getAsInt();
-			SoftwarePort sp = new SoftwarePort(softwareId, PortType.OUTPUT, formatId);
+			ArrayList<Integer> formatIds = new ArrayList<Integer>();
+			while (j.hasNext()) {
+				JsonElement nextFormat = j.next();
+				int formatId = nextFormat.getAsInt();
+				formatIds.add(formatId);
+			}
+			SoftwarePort sp = new SoftwarePort(softwareId, PortType.OUTPUT, formatIds);
 			int portNumber = numAsJp.getAsInt();
 			sp.setPortId(portNumber-1);
 			outputPorts.add(sp);
@@ -107,27 +115,31 @@ public class SoftwareManager {
 		for (SoftwareNode sn : softwareNodes) {
 			idToSoftwareNode.put(sn.uid, sn);
 			for (SoftwarePort sp : sn.inputPorts) {
-				Integer formatId = sp.dataFormatID;
-				ArrayList<SoftwareNode> sForId;
-				if (!softwareByInputFormatId.containsKey(formatId)) {
-					sForId = new ArrayList<SoftwareNode>();
-					softwareByInputFormatId.put(formatId, sForId);
-				} else {
-					sForId = softwareByInputFormatId.get(formatId);
+				ArrayList<Integer> formatIds = sp.getDataFormats();
+				for (Integer formatId : formatIds) {
+					ArrayList<SoftwareNode> sForId;
+					if (!softwareByInputFormatId.containsKey(formatId)) {
+						sForId = new ArrayList<SoftwareNode>();
+						softwareByInputFormatId.put(formatId, sForId);
+					} else {
+						sForId = softwareByInputFormatId.get(formatId);
+					}
+					sForId.add(sn);
 				}
-				sForId.add(sn);
 			}
 
 			for (SoftwarePort sp : sn.outputPorts) {
-				Integer formatId = sp.dataFormatID;
-				ArrayList<SoftwareNode> sForId;
-				if (!softwareByOutputFormatId.containsKey(formatId)) {
-					sForId = new ArrayList<SoftwareNode>();
-					softwareByOutputFormatId.put(formatId, sForId);
-				} else {
-					sForId = softwareByOutputFormatId.get(formatId);
+				ArrayList<Integer> formatIds = sp.getDataFormats();
+				for (Integer formatId : formatIds) {
+					ArrayList<SoftwareNode> sForId;
+					if (!softwareByOutputFormatId.containsKey(formatId)) {
+						sForId = new ArrayList<SoftwareNode>();
+						softwareByOutputFormatId.put(formatId, sForId);
+					} else {
+						sForId = softwareByOutputFormatId.get(formatId);
+					}
+					sForId.add(sn);
 				}
-				sForId.add(sn);
 			}
 		}
 	}

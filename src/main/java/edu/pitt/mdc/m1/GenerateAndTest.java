@@ -149,14 +149,16 @@ public class GenerateAndTest {
 				if (!oneDfMatchingInputObjectList.isEmpty())
 					consolidatedDfMatchingInputObjectList.addAll(oneDfMatchingInputObjectList); 
 			}
+
+			// This conditional exits the recursion if any of the requisite matching lists is empty.
+			if (consolidatedDfMatchingInputObjectList.isEmpty()) {
+				System.out.println("****consolidatedDfMatchingInputObjectList isEmpty.  Subtract 1 from this to get array index: " + numUnboundInputs);
+				return false;
+			} else {
+				dfMatchingInputObjectLists.add(consolidatedDfMatchingInputObjectList);
+			}
 		}
 
-		// This conditional exits the recursion if any of the requisite matching lists is empty.
-		if (consolidatedDfMatchingInputObjectList.isEmpty()) {
-			System.out.println("****consolidatedDfMatchingInputObjectList isEmpty.  Subtract 1 from this to get array index: " + numUnboundInputs);
-			return false;
-		} else
-			dfMatchingInputObjectLists.add(consolidatedDfMatchingInputObjectList);
 
 
 		// Generate all combinations of DATASETS and/or SOFTWARE that satisfy (DF only) all unbound inputs of the graph 
@@ -168,6 +170,7 @@ public class GenerateAndTest {
 			printGraph(g);  
 		}
 
+		System.out.println("Number of unbound inputs: " + numUnboundInputs + ", dfMatchingInputObjectLists.size() = " + dfMatchingInputObjectLists.size());
 		if (numUnboundInputs > 0 && numUnboundInputs < 9) {
 			Iterator<DigitalResearchObject> iterInput1 = dfMatchingInputObjectLists.get(0).iterator();  
 			while (iterInput1.hasNext()) {
@@ -537,15 +540,15 @@ public class GenerateAndTest {
 				sn.title = sm.getTitleForSoftware(softwareID);
 			}
 			//get the input ports for the software and add them to the SoftwareNode
-			Iterator<Integer> iterI = sddfr.getInputDataFormatsForSoftware(softwareID).iterator();
-			Integer portID =0;   // more accurate to say that input ports are numbered from 0 within each software.
+			Iterator<ArrayList<Integer>> iterI = sddfr.getInputDataFormatsForSoftware(softwareID).iterator();
+			Integer portID = 0;   // more accurate to say that input ports are numbered from 0 within each software.
 			while (iterI.hasNext()) {
 				SoftwarePort ip = new SoftwarePort(softwareID,PortType.OUTPUT,iterI.next()); //softwareID, type (0=output, 1=input), dataformatID  
 				ip.setPortId(portID++);
 				sn.inputPorts.add(ip);
 			}
 			//get the output ports for the software and add them to the SoftwareNode
-			Iterator<Integer> iterO = sddfr.getOutputDataFormatsForSoftware(softwareID).iterator();
+			Iterator<ArrayList<Integer>> iterO = sddfr.getOutputDataFormatsForSoftware(softwareID).iterator();
 			portID =0;
 			while (iterO.hasNext()) {
 				SoftwarePort op = new SoftwarePort(softwareID,PortType.INPUT,iterO.next()); // softwareID, type (0=output, 1=input), dataformatID  

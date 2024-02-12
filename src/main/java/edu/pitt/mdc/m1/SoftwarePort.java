@@ -5,11 +5,11 @@ import java.util.ArrayList;
 public class SoftwarePort implements Cloneable
 {
 	public ArrayList<Integer> getDataFormats() {
-		return dataFormatIds;
+		return (ArrayList<Integer>)this.dataFormatIds.clone();
 	}
 
 	public void setDataFormats(ArrayList<Integer> dataFormats) {
-		this.dataFormatIds = dataFormats;
+		this.dataFormatIds = (ArrayList<Integer>)dataFormats.clone();
 	}
 
 	Integer portID;

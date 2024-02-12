@@ -43,17 +43,17 @@ public class TestM1 {
 			SoftwareNode s = new SoftwareNode(softwareID);
 
 			// get the info about software from the repository   get input ports and get output ports
-			ArrayList<Integer> inputs = sddfr.getInputDataFormatsForSoftware(softwareID);
-			ArrayList<Integer> outputs = sddfr.getOutputDataFormatsForSoftware(softwareID);
-			Iterator<Integer> iterI = inputs.iterator();
-			Iterator<Integer> iterO = outputs.iterator();
+			ArrayList<ArrayList<Integer>> inputs = sddfr.getInputDataFormatsForSoftware(softwareID);
+			ArrayList<ArrayList<Integer>> outputs = sddfr.getOutputDataFormatsForSoftware(softwareID);
+			Iterator<ArrayList<Integer>> iterI = inputs.iterator();
+			Iterator<ArrayList<Integer>> iterO = outputs.iterator();
 
 			int portCtr = 0; 
-			int portDataFormat;
+			ArrayList<Integer> portDataFormats;
 			ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
 			while (iterI.hasNext()) {
-				portDataFormat = iterI.next();
-				dataFormatIds.add(portDataFormat); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
+				portDataFormats = iterI.next();
+				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
 				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, dataFormatIds);
 				p.setPortId(portCtr++);
 				s.inputPorts.add(p);
@@ -61,17 +61,20 @@ public class TestM1 {
 			
 			// have to hack any multiDF ports. Here's where we replace inport DF list.
 			// Specifically, we replace the one-DF list of dataformats for SoftwareNode 2002 input[0] with a list of data formats 3 and 6
+			/*
+			I moved this to creation of test repository in SoftwareDatasetDataFomratRepository
 			if(softwareID==2002) {
 				ArrayList<Integer> x = new ArrayList<Integer>();
 				x.add(3);
 				x.add(6);
 				s.inputPorts.get(0).setDataFormats(x);;
 			}
+			*/
 			
 			portCtr = 0;
 			while (iterO.hasNext()) {
-				portDataFormat = iterI.next();
-				dataFormatIds.add(portDataFormat); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
+				portDataFormats = iterO.next();
+				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
 				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, dataFormatIds);
 				p.setPortId(portCtr++);
 				s.outputPorts.add(p);
