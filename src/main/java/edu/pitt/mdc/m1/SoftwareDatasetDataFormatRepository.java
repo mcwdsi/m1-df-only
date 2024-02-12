@@ -88,7 +88,9 @@ public class SoftwareDatasetDataFormatRepository {
 				ArrayList<DigitalResearchObject> list = new ArrayList<DigitalResearchObject>();
 				this.objectList.put(dataFormatID, list);
 			}			
-			return this.objectList.get(dataFormatID);
+			ArrayList<DigitalResearchObject> x = new ArrayList<DigitalResearchObject>();
+			x.addAll(this.objectList.get(dataFormatID));
+			return x;
 		}
 			
 	public static HashMap<Integer, ArrayList<Software>> createSoftwareListTestCollection() {
@@ -120,6 +122,7 @@ public class SoftwareDatasetDataFormatRepository {
 			
 		ArrayList<Software> softwareList6 = new ArrayList<Software>();
 			softwareList6.add(new Software("Software 2001", 2001, PortType.INPUT, 0)); 
+			softwareList6.add(new Software("Software 2002", 2002, PortType.INPUT, 0)); //making this input port multi-data-format (3 and 6)
 		formatToSoftwareList.put(Integer.valueOf(6), softwareList6);			
 		
 		return formatToSoftwareList;			
@@ -137,10 +140,13 @@ public class SoftwareDatasetDataFormatRepository {
 				ArrayList<Software> list = new ArrayList<Software>();
 				this.softwareList.put(dataFormatID, list);
 			}
-			return this.softwareList.get(dataFormatID);
+			ArrayList<Software> x = new ArrayList<Software>();
+			x.addAll(this.softwareList.get(dataFormatID));
+			return x;
 		}	
 		
 
+		// This method assumes one data format per port.  It has to be replaced.
 	public static HashMap<Integer, ArrayList<Integer>> createInputsAndFormatsTestCollection() {
 		HashMap<Integer, ArrayList<Integer>> softwareIdToInputFormatIds =
 			new HashMap<Integer, ArrayList<Integer>>();
@@ -188,7 +194,9 @@ public class SoftwareDatasetDataFormatRepository {
 		// Limitations: Exactly 1 DF per input;  code handles ??? up to 2-input software
 		
 		public ArrayList<Integer> getInputDataFormatsForSoftware(Integer softwareID){
-			return this.inputsAndFormats.get(softwareID);
+			ArrayList<Integer> x = new ArrayList<Integer>();
+			x.addAll(this.inputsAndFormats.get(softwareID));
+			return x;
 		}
 		
 	
@@ -235,7 +243,9 @@ public class SoftwareDatasetDataFormatRepository {
 		// overloaded identifier conventions:  abcd  a-data format; d=makes identifier unique, given data format
 		
 		public ArrayList<Integer> getOutputDataFormatsForSoftware(Integer softwareID){
-			return this.outputsAndFormats.get(softwareID);
+			ArrayList<Integer> x = new ArrayList<Integer>();
+			x.addAll(this.outputsAndFormats.get(softwareID));
+			return x;
 		}
 
 	protected void buildObjectList(DatasetManager dm, SoftwareManager sm) {

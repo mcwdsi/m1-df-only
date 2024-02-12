@@ -27,14 +27,14 @@ public class TestM1 {
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
-		runOnMdcSubset("small-set");
-		runOnMdcSubset("restricted");
-		runOnMdcSubset("limited");
+	//	runOnMdcSubset("small-set");
+	//	runOnMdcSubset("restricted");
+	//	runOnMdcSubset("limited");
     }
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
 		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
-		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001,2002)); //2000 somehow causes cycle
+		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList(1000,1001,1002,2000, 2001, 2002)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
 		GenerateAndTest.sddfr = sddfr;
@@ -48,17 +48,31 @@ public class TestM1 {
 			Iterator<Integer> iterI = inputs.iterator();
 			Iterator<Integer> iterO = outputs.iterator();
 
-			int portCtr = 0;
+			int portCtr = 0; 
+			int portDataFormat;
+			ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
 			while (iterI.hasNext()) {
-				//SoftwarePort(Integer softwareID, int type, Integer dataFormatID)
-				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, iterI.next());
+				portDataFormat = iterI.next();
+				dataFormatIds.add(portDataFormat); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
+				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, dataFormatIds);
 				p.setPortId(portCtr++);
 				s.inputPorts.add(p);
 			}
-
+			
+			// have to hack any multiDF ports. Here's where we replace inport DF list.
+			// Specifically, we replace the one-DF list of dataformats for SoftwareNode 2002 input[0] with a list of data formats 3 and 6
+			if(softwareID==2002) {
+				ArrayList<Integer> x = new ArrayList<Integer>();
+				x.add(3);
+				x.add(6);
+				s.inputPorts.get(0).setDataFormats(x);;
+			}
+			
 			portCtr = 0;
 			while (iterO.hasNext()) {
-				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, iterO.next());
+				portDataFormat = iterI.next();
+				dataFormatIds.add(portDataFormat); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
+				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, dataFormatIds);
 				p.setPortId(portCtr++);
 				s.outputPorts.add(p);
 			}

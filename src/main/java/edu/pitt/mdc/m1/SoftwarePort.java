@@ -1,19 +1,31 @@
 package edu.pitt.mdc.m1;
 
+import java.util.ArrayList;
+
 public class SoftwarePort implements Cloneable
 {
+	public ArrayList<Integer> getDataFormats() {
+		return dataFormatIds;
+	}
+
+	public void setDataFormats(ArrayList<Integer> dataFormats) {
+		this.dataFormatIds = dataFormats;
+	}
+
 	Integer portID;
-	Integer softwareID;  // the software it is part of
-	PortType type;  //should use ENUM of input, output, but for now 0 denotes output and 1 denotes input. 
-	Integer dataFormatID;  // its required data format
+	Integer softwareID;  // the software the port is a part of
+	PortType type;  // INPUT, OUTPUT
+	ArrayList<Integer> dataFormatIds;  
+	//Integer dataFormatID;  // TODO: deprecate  its required data format
 	Integer boundToObjectId = 0;  // 0 denotes unbound. non-zero Integer is the softwareID or datasetID it is bound to. Perhaps better if it were of a new type DirectedEdge. Nil would mean unbound
 	int boundToSoftwarePortArrayIndex =0; // the array index of the port within the software it is bound to.
+	//Integer secondDataFormatId;  // development hack so I can introduce a multi-DF port (2 DFs)
 	
-    SoftwarePort(Integer softwareID, PortType type, Integer dataFormatID) { //type: 0=input, 1=output
+    SoftwarePort(Integer softwareID, PortType type, ArrayList<Integer> dataFormatIds) { //type: INPUT, OUTPUT
         this.portID = 0;  // could be concatenation of software ID, input or output flag, and array index?
         this.softwareID=softwareID;
         this.type = type; 
-        this.dataFormatID = dataFormatID; 
+        this.dataFormatIds = dataFormatIds; 
         this.boundToObjectId = 0;          // 0 means unbound.
         this.boundToSoftwarePortArrayIndex = 0;    // In general, the bindings aren't set when the port is created.
     }
@@ -30,7 +42,14 @@ public class SoftwarePort implements Cloneable
     public Integer getPortId() {
     	return this.portID;
     }    
+    /*public void setSecondDataFormatId(Integer secondDataFormatId) {
+    	this.secondDataFormatId = secondDataFormatId;
+    }  
     
+    public Integer getSecondDataFormatId() {
+    	return this.secondDataFormatId;
+    }    
+    */
     
     public Integer getBoundToObjectId() {
     	return this.boundToObjectId;

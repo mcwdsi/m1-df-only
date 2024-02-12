@@ -7,5 +7,4 @@ package edu.pitt.mdc.m1;
 public class DigitalResearchObject {
    Integer rdoId;
    String title;
-   
 }
