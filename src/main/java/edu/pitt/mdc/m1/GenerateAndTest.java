@@ -1,7 +1,6 @@
 package edu.pitt.mdc.m1;
 import java.util.*; 
 import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.Graphs;
 import com.google.common.graph.ValueGraphBuilder;
 
 public class GenerateAndTest {
@@ -76,7 +75,7 @@ public class GenerateAndTest {
 					SoftwareNode sUnbound = new SoftwareNode(666);  // will point to the unbound node in g1
 					while (iter.hasNext()) {  // can't just use array index to go right to software node.  have to look through them to find it
 						sUnbound = (SoftwareNode) iter.next();
-						if (sUnbound.uid - ugo.softwareId ==0) {
+						if (sUnbound.uid.equals(ugo.softwareId)) {
 							break;
 						}
 					}
@@ -127,7 +126,7 @@ public class GenerateAndTest {
 
 		Iterator<UnboundGraphInput> iterP = unboundGraphInputs.iterator(); 
 		Integer dataFormatID;
-		//Integer secondDataFormatId =0;  // hack
+		//Integer secondDataFormatId = 0;  // hack
 		int numUnboundInputs = 0;
 
 		//for each unbound graph inport, create a list of software and datasets that data-format match the graph inport data formats (plural)
@@ -286,7 +285,7 @@ public class GenerateAndTest {
 				//System.out.println("Software is " + s.uid + "\n");
 				s = (SoftwareNode)n;
 				Iterator<SoftwarePort> iter2 = s.outputPorts.iterator();
-				int portCtr =0;
+				int portCtr = 0;
 				while (iter2.hasNext()) {
 					p = iter2.next();
 					if (p.boundToObjectId==0) {
@@ -326,7 +325,7 @@ public class GenerateAndTest {
 				while (iter.hasNext()) {  // a workaround to find a software node in the MutableValueGraph.
 					s = (SoftwareNode) iter.next();
 					// is s is the graph node we are looking for (the one specified in UnknownGraphInput)?  
-					if (s.uid - ugi.softwareId ==0) {
+					if (s.uid.equals(ugi.softwareId)) {
 						// then "bind" it to the the DigitalResearchObject specified in UnknownGraphInput 
 						// first bind its unique id.  If the DigitalResearchObject is a Dataset, that's all we need to do
 						s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToObjectId(ugi.getObjectToBindTo().rdoId); 
@@ -542,7 +541,7 @@ public class GenerateAndTest {
 			}
 			//get the output ports for the software and add them to the SoftwareNode
 			Iterator<ArrayList<Integer>> iterO = sddfr.getOutputDataFormatsForSoftware(softwareID).iterator();
-			portID =0;
+			portID = 0;
 			while (iterO.hasNext()) {
 				SoftwarePort op = new SoftwarePort(softwareID,PortType.INPUT,iterO.next()); // softwareID, type (0=output, 1=input), dataformatID  
 				op.setPortId(portID++);

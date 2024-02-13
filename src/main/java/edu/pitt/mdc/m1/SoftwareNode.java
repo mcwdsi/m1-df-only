@@ -9,21 +9,21 @@ public class SoftwareNode extends Node implements Cloneable
 	String title;
 
 	SoftwareNode(Integer uid) { 
-		this.uid = uid;
-		this.inputPorts = new ArrayList<SoftwarePort>();
-		this.outputPorts = new ArrayList<SoftwarePort>();
+	      super(uid);
+	      this.inputPorts = new ArrayList<SoftwarePort>();
+	      this.outputPorts = new ArrayList<SoftwarePort>();
 	}
 
 	public int numInputs() {
-		return this.inputPorts.size();
+	      return this.inputPorts.size();
 	}
 
 	public int numOutputs() {
-		return this.outputPorts.size();
+	      return this.outputPorts.size();
 	}
 
 	public String getTitle() {
-		return this.title;
+	      return this.title;
 	}
 
 }

@@ -54,9 +54,9 @@ public class DatasetManager {
 			} else {
 				dsForFormat = formatIdToDatasets.get(key);
 			}
-			Dataset d = new Dataset(dn.title, dn.id, dn.formatId);
+			Dataset d = new Dataset(dn.title, dn.uid, dn.formatId);
 			dsForFormat.add(d);
-			idToDataset.put(dn.id, d);
+			idToDataset.put(dn.uid, d);
 		}
 	}
 

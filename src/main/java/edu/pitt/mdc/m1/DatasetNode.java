@@ -1,18 +1,14 @@
 package edu.pitt.mdc.m1;
 
 public class DatasetNode extends Node {
-	int id;
+
 	int formatId;
 	String title;
 
 	public DatasetNode(int id, int formatId, String title) {
-		this.id = id;
+		super(id);
 		this.title = title;
 		this.formatId = formatId;
-	}
-
-	public int getId() {
-		return this.id;
 	}
 
 	public int getFormatId() {

@@ -4,6 +4,14 @@ package edu.pitt.mdc.m1;
 public class Node implements Comparable<Node> {
 	 Integer uid;
 
+	 public Node(int uid) {
+	 	this.uid = uid;
+	 }
+
+	 public int getId() {
+	 	return this.uid;
+	 }
+
 	 public boolean equals(Object o) {
 	 	return (o instanceof Node) && ((Node)o).uid == this.uid;
 	 }
