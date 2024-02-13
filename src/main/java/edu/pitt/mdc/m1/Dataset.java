@@ -4,9 +4,8 @@ public class Dataset extends DigitalResearchObject {
    Integer dataFormat;
    
    Dataset(String title, Integer datasetId, Integer dataFormat){
-	   super();
+	   super(datasetId);
 	   this.title = title;
-	   this.rdoId = datasetId;
 	   this.dataFormat = dataFormat;
    }
 }

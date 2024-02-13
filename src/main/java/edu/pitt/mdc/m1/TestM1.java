@@ -17,6 +17,7 @@ import com.google.common.graph.ValueGraphBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
@@ -28,7 +29,7 @@ public class TestM1 {
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
 	//	runOnMdcSubset("small-set");
-	//	runOnMdcSubset("restricted");
+		runOnMdcSubset("restricted");
 	//	runOnMdcSubset("limited");
     }
 
@@ -208,7 +209,15 @@ public class TestM1 {
 				Iterator<JsonElement> i = ja.iterator();
 				while (i.hasNext()) {
 					JsonElement jei = i.next();
-					DatasetNode dn = gs.fromJson(jei, DatasetNode.class);
+					//DatasetNode dn = gs.fromJson(jei, DatasetNode.class);
+					JsonObject joi = jei.getAsJsonObject();
+					JsonElement idAsJe = joi.get("id");
+					JsonElement formatIdAsJe = joi.get("formatId");
+					JsonElement titleAsJe = joi.get("title");
+					int id = idAsJe.getAsInt();
+					int formatId = formatIdAsJe.getAsInt();
+					String title = titleAsJe.getAsString();
+					DatasetNode dn = new DatasetNode(id, formatId, title);
 					dsNodes.add(dn);
 				}
 			}

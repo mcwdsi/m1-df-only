@@ -7,9 +7,8 @@ public class Software extends DigitalResearchObject
 	int portNumber;          // DF-matching port (the goodies!)
 	
 	Software(String title, Integer softwareId, PortType portType, int portNumber, int formatId) {
-		super();
+		super(softwareId);
 		this.title = title;
-		this.rdoId = softwareId;
 		this.portType = portType;
 		this.portNumber = portNumber;
 		this.dataFormat = formatId;

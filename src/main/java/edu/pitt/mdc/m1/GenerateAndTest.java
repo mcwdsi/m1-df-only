@@ -245,12 +245,13 @@ public class GenerateAndTest {
 		while (i.hasNext()) {
 			Node n=i.next();  
 			if (n instanceof SoftwareNode) { 
-				//System.out.println("Software is " + s.uid + "\n");
 				SoftwareNode s = (SoftwareNode)n;
+				//System.out.println("Software is " + s.uid + "\n");
 				Iterator<SoftwarePort> iter2 = s.inputPorts.iterator();
 				int portCtr = 0;
 				while (iter2.hasNext()) {
 					SoftwarePort p = iter2.next();
+					//System.out.println("Port is " + p.portID + " boundTo is " + p.boundToObjectId + " type is " + p.type); 
 					if (p.boundToObjectId==0) {  // could be null or zero if we don't initialize new ports to 0 !!!
 						ugi = new UnboundGraphInput(portCtr, p.getDataFormats(), p.softwareID); // software array index, port array index, data format UID
 						unboundGraphInputList.add(ugi);
@@ -535,7 +536,7 @@ public class GenerateAndTest {
 			Iterator<ArrayList<Integer>> iterI = sddfr.getInputDataFormatsForSoftware(softwareID).iterator();
 			Integer portID = 0;   // more accurate to say that input ports are numbered from 0 within each software.
 			while (iterI.hasNext()) {
-				SoftwarePort ip = new SoftwarePort(softwareID,PortType.OUTPUT,iterI.next()); //softwareID, type (0=output, 1=input), dataformatID  
+				SoftwarePort ip = new SoftwarePort(softwareID,PortType.INPUT,iterI.next()); //softwareID, type (0=output, 1=input), dataformatID  
 				ip.setPortId(portID++);
 				sn.inputPorts.add(ip);
 			}
@@ -543,7 +544,7 @@ public class GenerateAndTest {
 			Iterator<ArrayList<Integer>> iterO = sddfr.getOutputDataFormatsForSoftware(softwareID).iterator();
 			portID = 0;
 			while (iterO.hasNext()) {
-				SoftwarePort op = new SoftwarePort(softwareID,PortType.INPUT,iterO.next()); // softwareID, type (0=output, 1=input), dataformatID  
+				SoftwarePort op = new SoftwarePort(softwareID,PortType.OUTPUT,iterO.next()); // softwareID, type (0=output, 1=input), dataformatID  
 				op.setPortId(portID++);
 				sn.outputPorts.add(op);
 			}

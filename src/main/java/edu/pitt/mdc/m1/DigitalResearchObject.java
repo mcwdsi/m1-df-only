@@ -7,4 +7,9 @@ package edu.pitt.mdc.m1;
 public class DigitalResearchObject {
    Integer rdoId;
    String title;
+
+   public DigitalResearchObject(Integer id) {
+      if (id == null) throw new IllegalArgumentException("rdoId cannot be null");
+      this.rdoId = id;
+   }
 }

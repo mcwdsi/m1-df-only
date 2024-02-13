@@ -49,6 +49,7 @@ public class SoftwarePort implements Cloneable
     }
     	
     public void setBoundToObjectId(Integer uid) {
+        if (uid == null) throw new IllegalArgumentException("Cannot have boundToObjectId == null");
     	this.boundToObjectId = uid;   // since the binding is to a port, setBoundTo has to know exactly which port. Ports unfortunately have relative Ids.  Relative to softwareId and whether they are input or output ports
     }
     public void setBoundToSoftwarePortArrayIndex(int uid) {
