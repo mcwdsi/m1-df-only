@@ -34,7 +34,7 @@ public class TestM1 {
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
 		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
-		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList( 2002)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
+		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList( 1000,1001,1002,2000, 2001, 2002, 2002)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
 		GenerateAndTest.sddfr = sddfr;

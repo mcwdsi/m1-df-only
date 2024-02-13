@@ -21,7 +21,6 @@ ArrayList<Integer> dataFormatIds;  // the data format UIDs for the unbound input
 DigitalResearchObject objectToBindTo;  // an object containing essential info about the dataset or software that M1 has selected for binding to the unbound graph input
 
 public UnboundGraphInput (int arrayIndexOfPort, ArrayList<Integer> dataFormatIds, Integer softwareId) {
-	//this.arrayIndexOfSoftware = arrayIndexOfSoftware;   // TODO: not used
 	this.softwareId = softwareId;
 	this.arrayIndexOfPort = arrayIndexOfPort;	
 	this.dataFormatIds = dataFormatIds;

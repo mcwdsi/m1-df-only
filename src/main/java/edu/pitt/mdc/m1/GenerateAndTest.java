@@ -36,10 +36,6 @@ public class GenerateAndTest {
 
 	public static boolean forwardSearch(MutableValueGraph<Node, Integer> g)
 	{	
-		// this variable will hold a list of df-matching software 
-		// each software on the list has an input port using the data format 
-		ArrayList<Software> dfMatchingSoftwareList = null;
-
 		UnboundGraphOutput ugo;	// will point to a specific unbound output SoftwarePort in a SoftwareNode in graph g
 
 		// get list of unbound outports in graph g
@@ -51,8 +47,8 @@ public class GenerateAndTest {
 			ugo = ugoIter.next();
 
 			// for each data format of the unbound outport
-			ArrayList<Software> DfMatchingSoftwareList = new ArrayList<Software>();
-			ArrayList<Software> masterDfMatchingSoftwareList = new ArrayList<Software>();
+			ArrayList<Software> dfMatchingSoftwareList = null;
+			ArrayList<Software> consolidatedDfMatchingSoftwareList = new ArrayList<Software>();
 			ArrayList<Integer> dataFormatIds = ugo.dataFormatIds;
 			Iterator<Integer> dfIter = dataFormatIds.iterator(); 
 			while (dfIter.hasNext()) { 
@@ -60,11 +56,11 @@ public class GenerateAndTest {
 				//concatenate lists of repository software w/ inport DF matching each of the multiple data formats of the unbound graph output port
 				dfMatchingSoftwareList = sddfr.softwareByInputDataformat(dataFormatId); 
 				if(!dfMatchingSoftwareList.isEmpty()) {
-					masterDfMatchingSoftwareList.addAll(dfMatchingSoftwareList);
+					consolidatedDfMatchingSoftwareList.addAll(dfMatchingSoftwareList);
 				}
 			}
 			// if list is not empty, there are repository software matching this unbound graph output port, so proceed to exhaustive binding
-			if (!masterDfMatchingSoftwareList.isEmpty()) {  
+			if (!consolidatedDfMatchingSoftwareList.isEmpty()) {  
 				// add each df-matching software in turn to clone copies of the graph and "bind" their data-format matching ports
 				Iterator<Software> iterMS = dfMatchingSoftwareList.iterator();
 				SoftwareNode s;
@@ -243,11 +239,7 @@ public class GenerateAndTest {
 		ArrayList<UnboundGraphInput> unboundGraphInputList = new ArrayList<UnboundGraphInput>();
 
 		Iterator<Node> i = g.nodes().iterator();
-		//Node n;
-		//SoftwareNode s;
-		//SoftwarePort p;
 		UnboundGraphInput ugi;
-		int nodeCtr =0;
 
 		// check each node's input ports to see if each is bound (test is == 0.) 
 		// If unbound, make an instance of UnboundGraphInport and add to list using unboundGraphInportList.add(ugi)
@@ -267,7 +259,6 @@ public class GenerateAndTest {
 					}
 					portCtr++;
 				}
-				nodeCtr++;
 			}
 			else System.out.println("WTF! A vertex isn't an instance of Node or of SoftwareNode!!\n");
 
@@ -581,10 +572,10 @@ public class GenerateAndTest {
 					ip1.setPortId(ip.getPortId());
 					ip1.setBoundToObjectId(ip.getBoundToObjectId());				
 					ip1.setBoundToSoftwarePortArrayIndex(ip.getBoundToSoftwarePortArrayIndex());
-
+					
 					s1.inputPorts.add(ip1);
 				}
-				int portCtr = 0;
+				// int portCtr = 0;
 				Iterator<SoftwarePort> iterOP = s.outputPorts.iterator();
 				while(iterOP.hasNext()){
 					op = iterOP.next();
