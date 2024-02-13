@@ -83,11 +83,13 @@ public class GenerateAndTest {
 					// add the softwareId and portNumber of the matching software to the unbound software in the graph
 					sUnbound.outputPorts.get(ugo.arrayIndexOfPort).setBoundToObjectId(matchingSoftware.rdoId);
 					sUnbound.outputPorts.get(ugo.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(matchingSoftware.portNumber);
+					sUnbound.outputPorts.get(ugo.arrayIndexOfPort).setBoundViaDataFormatId(matchingSoftware.getDataFormat());
 
 					// create a software node for the matching software, add the info about the software port in the graph to it, then add the node to g1
 					SoftwareNode ms = makeSoftwareNode(matchingSoftware.rdoId);
 					ms.inputPorts.get(matchingSoftware.portNumber).setBoundToObjectId(ugo.softwareId);
 					ms.inputPorts.get(matchingSoftware.portNumber).setBoundToSoftwarePortArrayIndex(ugo.arrayIndexOfPort);
+					ms.inputPorts.get(matchingSoftware.portNumber).setBoundViaDataFormatId(matchingSoftware.getDataFormat());
 
 					g1.addNode(ms);		
 
@@ -334,7 +336,8 @@ public class GenerateAndTest {
 						if (ugi.objectToBindTo instanceof Software) { 
 							//bind the software input port to 
 							Software x = (Software) ugi.getObjectToBindTo();  // necessary to cast ResearchDigitalObject to Software
-							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(x.portNumber);							
+							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(x.portNumber);
+							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundViaDataFormatId(x.dataFormat);
 
 							//make a SoftwareNode for software s to add to graph
 							sn = makeSoftwareNode(ugi.objectToBindTo.rdoId); // sn is returned with all its ports.  Just need to set its output boundTo element
@@ -342,7 +345,9 @@ public class GenerateAndTest {
 							//now bind the unbound output port of sn
 							//int portNumber =  x.portNumber
 							sn.outputPorts.get(x.portNumber).setBoundToObjectId(ugi.softwareId);		
-							sn.outputPorts.get(x.portNumber).setBoundToSoftwarePortArrayIndex(ugi.arrayIndexOfPort);				
+							sn.outputPorts.get(x.portNumber).setBoundToSoftwarePortArrayIndex(ugi.arrayIndexOfPort);
+							sn.outputPorts.get(x.portNumber).setBoundViaDataFormatId(x.getDataFormat());
+
 							newSoftwareNodes.add(sn);	
 						}
 						break;
@@ -401,17 +406,17 @@ public class GenerateAndTest {
 				while (iterIp.hasNext())  {
 					SoftwarePort p = iterIp.next();
 					if (p.boundToObjectId==0)
-						System.out.println("    Inport[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+						System.out.println("    Inport[" + p.portID + "] of Software " + softwareInfo + " is unbound"); 	
 					else {
 						if(p.boundToObjectId < 1000) {
 							String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
 								Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
 							System.out.println("    Inport[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
 						} else {
-
-							String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+							String sBoundToInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
 								Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
-							System.out.println("    Inport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+							System.out.println("    Inport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundToInfo  + 
+								", Outport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId()); 	
 						}
 					}
 				}
@@ -421,8 +426,12 @@ public class GenerateAndTest {
 					SoftwarePort p = iterOp.next();
 					if (p.boundToObjectId==0)
 						System.out.println("    Outport[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
-					else
-						System.out.println("    Outport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 						
+					else {
+						String sBoundToInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+								Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
+						System.out.println("    Outport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundToInfo  
+							+ ", Inport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());
+					}
 				}
 			} 
 		}
@@ -436,9 +445,6 @@ public class GenerateAndTest {
 
 			Iterator<Node> iter = nodeList.iterator();
 			SoftwareNode s;
-			String sw = new String("software ");
-			String ds = new String("dataset ");
-			String text;
 
 			while (iter.hasNext()) {  
 				s = (SoftwareNode) iter.next();
@@ -450,28 +456,32 @@ public class GenerateAndTest {
 				while (iterIp.hasNext())  {
 					SoftwarePort p = iterIp.next();
 					if (p.boundToObjectId==0)
-						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+						sb.append("    Inport[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
 					else {
 						if(p.boundToObjectId < 1000) {
 							String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
 								Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
-							sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
+							sb.append("    Inport[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
 						} else {
-							text = sw;
-							String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+							String sBoundToInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
 								Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
-							sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
+							sb.append("    Inport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundToInfo  + 
+								", Outport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());
 						}
 					}
 				}
-				if(!iterOp.hasNext()) sb.append("    Output ports: none"); 	
+				if(!iterOp.hasNext()) sb.append("    Outports: none"); 	
 
 				while (iterOp.hasNext()) { 
 					SoftwarePort p = iterOp.next();
 					if (p.boundToObjectId==0)
-						sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
-					else
-						sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 						
+						sb.append("    Outport[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
+					else {
+						String sBoundToInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
+								Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
+						sb.append("    Outport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundToInfo  + 
+							", Inport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());					
+					}
 				}
 			} 
 			return sb.toString();
@@ -572,6 +582,7 @@ public class GenerateAndTest {
 					ip1.setPortId(ip.getPortId());
 					ip1.setBoundToObjectId(ip.getBoundToObjectId());				
 					ip1.setBoundToSoftwarePortArrayIndex(ip.getBoundToSoftwarePortArrayIndex());
+					ip1.setBoundViaDataFormatId(ip.getBoundViaDataFormatId());
 					
 					s1.inputPorts.add(ip1);
 				}
@@ -584,6 +595,7 @@ public class GenerateAndTest {
 					op1.setPortId(op.getPortId());
 					op1.setBoundToObjectId(op.getBoundToObjectId());				
 					op1.setBoundToSoftwarePortArrayIndex(op.getBoundToSoftwarePortArrayIndex());
+					op1.setBoundViaDataFormatId(op.getBoundViaDataFormatId());
 
 					s1.outputPorts.add(op1);
 				}

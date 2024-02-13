@@ -20,7 +20,8 @@ public class SoftwarePort implements Cloneable
 	PortType type;  // INPUT, OUTPUT
 	ArrayList<Integer> dataFormatIds;  
 	Integer boundToObjectId = 0;  // 0 denotes unbound. non-zero Integer is the softwareID or datasetID it is bound to. Perhaps better if it were of a new type DirectedEdge. Nil would mean unbound
-	int boundToSoftwarePortArrayIndex =0; // the array index of the port within the software it is bound to.
+	int boundToSoftwarePortArrayIndex = 0; // the array index of the port within the software it is bound to.
+    Integer boundViaDataFormatId = 0;
 	
     SoftwarePort(Integer softwareID, PortType type, ArrayList<Integer> dataFormatIds) { //type: INPUT, OUTPUT
         this.portID = 0;  // could be concatenation of software ID, input or output flag, and array index?
@@ -29,6 +30,7 @@ public class SoftwarePort implements Cloneable
         this.dataFormatIds = dataFormatIds; 
         this.boundToObjectId = 0;          // 0 means unbound.
         this.boundToSoftwarePortArrayIndex = 0;    // In general, the bindings aren't set when the port is created.
+        this.boundViaDataFormatId = 0;
     }
     
     // is this method needed?  If I have a variable SoftwarePort sp, I can just write sp.softwareID()
@@ -58,5 +60,14 @@ public class SoftwarePort implements Cloneable
     
     public Integer getBoundToSoftwarePortArrayIndex() {
     	return this.boundToSoftwarePortArrayIndex;
+    }
+
+    public void setBoundViaDataFormatId(Integer formatId) {
+        if (formatId == null) throw new IllegalArgumentException("boundViaDataFormatId cannot be null");
+        this.boundViaDataFormatId = formatId;
+    }
+
+    public Integer getBoundViaDataFormatId() {
+        return this.boundViaDataFormatId;
     }
 }
