@@ -125,8 +125,7 @@ public class GenerateAndTest {
 		// the while loop checks whether any array isEmpty().  If so, there is no way to instantiate all inputs for that graph and backSearch exits
 		ArrayList<ArrayList<DigitalResearchObject>> dfMatchingInputObjectLists = new ArrayList<ArrayList<DigitalResearchObject>>(); // TODO:  refactor variable name
 		ArrayList<DigitalResearchObject> oneDfMatchingInputObjectList = null;
-		ArrayList<DigitalResearchObject> consolidatedDfMatchingInputObjectList = new ArrayList<DigitalResearchObject>();
-
+		
 		ArrayList<UnboundGraphInput> unboundGraphInputs = getUnboundGraphInputs(g); 
 		UnboundGraphInput ugi;
 
@@ -142,6 +141,7 @@ public class GenerateAndTest {
 			numUnboundInputs++;  // DOUBLE CHECK THIS STATEMENT IS IN THE RIGHT PLACE
 			ArrayList<Integer> dataFormatIds = ugi.getDataFormatIds(); 
 			Iterator<Integer> dfIter = dataFormatIds.iterator();
+			ArrayList<DigitalResearchObject> consolidatedDfMatchingInputObjectList = new ArrayList<DigitalResearchObject>();
 			// for each data format for that port
 			while(dfIter.hasNext()) {
 				dataFormatID = dfIter.next();	
@@ -170,7 +170,6 @@ public class GenerateAndTest {
 			printGraph(g);  
 		}
 
-		System.out.println("Number of unbound inputs: " + numUnboundInputs + ", dfMatchingInputObjectLists.size() = " + dfMatchingInputObjectLists.size());
 		if (numUnboundInputs > 0 && numUnboundInputs < 9) {
 			Iterator<DigitalResearchObject> iterInput1 = dfMatchingInputObjectLists.get(0).iterator();  
 			while (iterInput1.hasNext()) {
@@ -244,23 +243,23 @@ public class GenerateAndTest {
 		ArrayList<UnboundGraphInput> unboundGraphInputList = new ArrayList<UnboundGraphInput>();
 
 		Iterator<Node> i = g.nodes().iterator();
-		Node n;
-		SoftwareNode s;
-		SoftwarePort p;
+		//Node n;
+		//SoftwareNode s;
+		//SoftwarePort p;
 		UnboundGraphInput ugi;
 		int nodeCtr =0;
 
 		// check each node's input ports to see if each is bound (test is == 0.) 
 		// If unbound, make an instance of UnboundGraphInport and add to list using unboundGraphInportList.add(ugi)
 		while (i.hasNext()) {
-			n=i.next();  
+			Node n=i.next();  
 			if (n instanceof SoftwareNode) { 
 				//System.out.println("Software is " + s.uid + "\n");
-				s = (SoftwareNode)n;
+				SoftwareNode s = (SoftwareNode)n;
 				Iterator<SoftwarePort> iter2 = s.inputPorts.iterator();
-				int portCtr =0;
+				int portCtr = 0;
 				while (iter2.hasNext()) {
-					p = iter2.next();
+					SoftwarePort p = iter2.next();
 					if (p.boundToObjectId==0) {  // could be null or zero if we don't initialize new ports to 0 !!!
 						ugi = new UnboundGraphInput(portCtr, p.getDataFormats(), p.softwareID); // software array index, port array index, data format UID
 						unboundGraphInputList.add(ugi);
@@ -367,6 +366,9 @@ public class GenerateAndTest {
 			if (isAbstractWorkflow(g1)) {
 				int graphSize = gList.size() + 1;
 				System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
+				if (graphSize == 126) {
+					printGraph(g1);
+				}
 				backSearch(g1);
 			} 
 			else { // it is a concrete workflow, so we add it to gList and print it

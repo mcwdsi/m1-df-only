@@ -50,9 +50,10 @@ public class TestM1 {
 
 			int portCtr = 0; 
 			ArrayList<Integer> portDataFormats;
-			ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
+			
 			while (iterI.hasNext()) {
 				portDataFormats = iterI.next();
+				ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
 				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
 				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, dataFormatIds);
 				p.setPortId(portCtr++);
@@ -74,6 +75,7 @@ public class TestM1 {
 			portCtr = 0;
 			while (iterO.hasNext()) {
 				portDataFormats = iterO.next();
+				ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
 				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
 				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, dataFormatIds);
 				p.setPortId(portCtr++);

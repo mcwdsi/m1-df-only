@@ -47,17 +47,17 @@ public class SoftwareDatasetDataFormatRepository {
 			objectList1.add(new Dataset("Dataset 100", 100, 1));  
 			objectList1.add(new Dataset("Dataset 101", 101, 1));
 			objectList1.add(new Dataset("Dataset 102", 102, 1));
-			objectList1.add(new Software("Software 1000", 1000, PortType.OUTPUT, 0));  
-			objectList1.add(new Software("Software 1001", 1001, PortType.OUTPUT, 0));
-			objectList1.add(new Software("Software 1002", 1002, PortType.OUTPUT, 0));
-			objectList1.add(new Software("Software 2001", 2001, PortType.OUTPUT, 0));
+			objectList1.add(new Software("Software 1000", 1000, PortType.OUTPUT, 0, 1));  
+			objectList1.add(new Software("Software 1001", 1001, PortType.OUTPUT, 0, 1));
+			objectList1.add(new Software("Software 1002", 1002, PortType.OUTPUT, 0, 1));
+			objectList1.add(new Software("Software 2001", 2001, PortType.OUTPUT, 0, 1));
 		formatToObjectList.put(Integer.valueOf(1), objectList1);
 			
 		ArrayList<DigitalResearchObject> objectList2 = new ArrayList<DigitalResearchObject>();
 			objectList2.add(new Dataset("Dataset 200", 200, 2));
 			objectList2.add(new Dataset("Dataset 201", 201, 2));
 			objectList2.add(new Dataset("Dataset 202", 202, 2));
-			objectList2.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0));
+			objectList2.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0, 2));
 		formatToObjectList.put(Integer.valueOf(2), objectList2);	
 		
 		ArrayList<DigitalResearchObject> objectList3 = new ArrayList<DigitalResearchObject>();
@@ -76,7 +76,7 @@ public class SoftwareDatasetDataFormatRepository {
 
 		ArrayList<DigitalResearchObject> objectList6 = new ArrayList<DigitalResearchObject>();
 			objectList6.add(new Dataset("Dataset 600", 600, 6));   // TODO: comment out to to see if the code breaks 
-			objectList6.add(new Software("Software 1000", 1000, PortType.OUTPUT, 1)); // software 1000 has two outputs.  Make sure it is consistent with getOutputDataFormatsForSoftware
+			objectList6.add(new Software("Software 1000", 1000, PortType.OUTPUT, 1, 6)); // software 1000 has two outputs.  Make sure it is consistent with getOutputDataFormatsForSoftware
 		formatToObjectList.put(Integer.valueOf(6), objectList6);	
 		
 		return formatToObjectList;
@@ -103,27 +103,27 @@ public class SoftwareDatasetDataFormatRepository {
 		formatToSoftwareList.put(Integer.valueOf(1), softwareList1);
 
 		ArrayList<Software> softwareList2 = new ArrayList<Software>();  // Data format 2
-			softwareList2.add(new Software("Software 1000", 1000, PortType.INPUT, 0));  
-			softwareList2.add(new Software("Software 1001", 1001, PortType.INPUT, 0));   
+			softwareList2.add(new Software("Software 1000", 1000, PortType.INPUT, 0, 2));  
+			softwareList2.add(new Software("Software 1001", 1001, PortType.INPUT, 0, 2));   
 		formatToSoftwareList.put(Integer.valueOf(2), softwareList2);
 
 		ArrayList<Software> softwareList3 = new ArrayList<Software>();
-			softwareList3.add(new Software("Software 1000", 1000, PortType.INPUT, 1));  
-			softwareList3.add(new Software("Software 2000", 2000, PortType.INPUT, 0)); 
-			softwareList3.add(new Software("Software 2002", 2002, PortType.INPUT, 0)); 
+			softwareList3.add(new Software("Software 1000", 1000, PortType.INPUT, 1, 3));  
+			softwareList3.add(new Software("Software 2000", 2000, PortType.INPUT, 0, 3)); 
+			softwareList3.add(new Software("Software 2002", 2002, PortType.INPUT, 0, 3)); 
 		formatToSoftwareList.put(Integer.valueOf(3), softwareList3);	
 		
 		ArrayList<Software> softwareList4 = new ArrayList<Software>();
-			softwareList4.add(new Software("Software 2000", 2000, PortType.INPUT, 1)); 
+			softwareList4.add(new Software("Software 2000", 2000, PortType.INPUT, 1, 4)); 
 		formatToSoftwareList.put(Integer.valueOf(4), softwareList4);			
 			
 		ArrayList<Software> softwareList5 = new ArrayList<Software>();
-			softwareList5.add(new Software("Software 1002", 1002, PortType.INPUT, 0)); 
+			softwareList5.add(new Software("Software 1002", 1002, PortType.INPUT, 0, 5)); 
 		formatToSoftwareList.put(Integer.valueOf(5), softwareList5);			
 			
 		ArrayList<Software> softwareList6 = new ArrayList<Software>();
-			softwareList6.add(new Software("Software 2001", 2001, PortType.INPUT, 0)); 
-			softwareList6.add(new Software("Software 2002", 2002, PortType.INPUT, 0)); //making this input port multi-data-format (3 and 6)
+			softwareList6.add(new Software("Software 2001", 2001, PortType.INPUT, 0, 6)); 
+			softwareList6.add(new Software("Software 2002", 2002, PortType.INPUT, 0, 6)); //making this input port multi-data-format (3 and 6)
 		formatToSoftwareList.put(Integer.valueOf(6), softwareList6);			
 		
 		return formatToSoftwareList;			
@@ -196,7 +196,11 @@ public class SoftwareDatasetDataFormatRepository {
 		
 		public ArrayList<ArrayList<Integer>> getInputDataFormatsForSoftware(Integer softwareID){
 			ArrayList<ArrayList<Integer>> x = new ArrayList<ArrayList<Integer>>();
-			x.addAll(this.inputsAndFormats.get(softwareID));
+			for (ArrayList<Integer> nextPortFormats : this.inputsAndFormats.get(softwareID)) {
+				ArrayList<Integer> formats = new ArrayList<Integer>();
+				formats.addAll(nextPortFormats);
+				x.add(formats);
+			}
 			return x;
 		}
 		
@@ -245,7 +249,11 @@ public class SoftwareDatasetDataFormatRepository {
 		
 		public ArrayList<ArrayList<Integer>> getOutputDataFormatsForSoftware(Integer softwareID){
 			ArrayList<ArrayList<Integer>> x = new ArrayList<ArrayList<Integer>>();
-			x.addAll(this.outputsAndFormats.get(softwareID));
+			for (ArrayList<Integer> nextPortFormats : this.outputsAndFormats.get(softwareID)){
+				ArrayList<Integer> formats = new ArrayList<Integer>();
+				formats.addAll(nextPortFormats);
+				x.add(formats);
+			}
 			return x;
 		}
 
@@ -279,8 +287,7 @@ public class SoftwareDatasetDataFormatRepository {
 				ArrayList<Integer> outputFormatIds = output.getDataFormats();
 				snOutputsAndFormats.add(outputFormatIds);
 				for (Integer formatId : outputFormatIds) {
-					Software s = new Software(title, id, PortType.OUTPUT, portNum);
-					s.setDataFormat(formatId);
+					Software s = new Software(title, id, PortType.OUTPUT, portNum, formatId);
 					ArrayList<DigitalResearchObject> droList;
 					if (!this.objectList.containsKey(formatId)) {
 						droList = new ArrayList<DigitalResearchObject>();
@@ -314,8 +321,7 @@ public class SoftwareDatasetDataFormatRepository {
 				ArrayList<Integer> inputFormatIds = input.getDataFormats();
 				snInputsAndFormats.add(inputFormatIds);
 				for (Integer formatId : inputFormatIds) {
-					Software s = new Software(title, id, PortType.INPUT, portNum);
-					s.setDataFormat(formatId);
+					Software s = new Software(title, id, PortType.INPUT, portNum, formatId);
 					ArrayList<Software> sList;
 					if (!this.softwareList.containsKey(formatId)) {
 						sList = new ArrayList<Software>();
