@@ -337,7 +337,7 @@ public class GenerateAndTest {
 							//bind the software input port to 
 							Software x = (Software) ugi.getObjectToBindTo();  // necessary to cast ResearchDigitalObject to Software
 							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(x.portNumber);
-							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundViaDataFormatId(x.dataFormat);
+							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundViaDataFormatId(x.getDataFormat());
 
 							//make a SoftwareNode for software s to add to graph
 							sn = makeSoftwareNode(ugi.objectToBindTo.rdoId); // sn is returned with all its ports.  Just need to set its output boundTo element
@@ -380,7 +380,6 @@ public class GenerateAndTest {
 			}
 		}
 
-
 		public static boolean isAbstractWorkflow(MutableValueGraph<Node, Integer> g) {
 			if (getUnboundGraphInputs(g).isEmpty()) return false;
 			else return true; }
@@ -389,12 +388,9 @@ public class GenerateAndTest {
 			if (getUnboundGraphOutputList(g).isEmpty()) return false;
 			else return true; }
 
-
 		public static void printGraph(MutableValueGraph<Node, Integer> g){
-
 			Iterator<Node> iter = g.nodes().iterator(); // generalize at some point to printing graphs with DatasetNode and perhaps any Node
 			SoftwareNode s;
-
 
 			while (iter.hasNext()) {  
 				s = (SoftwareNode) iter.next();
@@ -482,52 +478,6 @@ public class GenerateAndTest {
 						sb.append("    Outport[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + sBoundToInfo  + 
 							", Inport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());					
 					}
-				}
-			} 
-			return sb.toString();
-		}
-
-		public static String graphToStringNonStrictOrdering(MutableValueGraph<Node, Integer> g) {
-			StringBuilder sb = new StringBuilder();
-
-			Iterator<Node> iter = g.nodes().iterator();
-			SoftwareNode s;
-			String sw = new String("software ");
-			String ds = new String("dataset ");
-			String text;
-
-			while (iter.hasNext()) {  
-				s = (SoftwareNode) iter.next();
-				Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
-				Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
-				String softwareInfo = s.uid + " (" + s.title + ")";
-				sb.append(" Software " + softwareInfo);
-
-				while (iterIp.hasNext())  {
-					SoftwarePort p = iterIp.next();
-					if (p.boundToObjectId==0)
-						sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
-					else {
-						if(p.boundToObjectId < 1000) {
-							String datasetInfo = (dm == null) ? Integer.toString(p.boundToObjectId) : 
-								Integer.toString(p.boundToObjectId) + " (" + dm.getTitleForDataset(p.boundToObjectId) + ")";
-							sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to dataset " + datasetInfo ); 	
-						} else {
-							text = sw;
-							String sBoundInfo = (sm == null) ? Integer.toString(p.boundToObjectId) :
-								Integer.toString(p.boundToObjectId) + " (" + sm.getTitleForSoftware(p.boundToObjectId) + ")";
-							sb.append("    Input port[" + p.portID + "] of Software " + p.softwareID + " is bound to " + text + sBoundInfo  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 	
-						}
-					}
-				}
-				if(!iterOp.hasNext()) sb.append("    Output ports: none"); 	
-
-				while (iterOp.hasNext()) { 
-					SoftwarePort p = iterOp.next();
-					if (p.boundToObjectId==0)
-						sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is unbound"); 	
-					else
-						sb.append("    Output port[" + p.portID + "] of Software " + p.softwareID + " is bound to software " + p.boundToObjectId  + ", port[" + p.boundToSoftwarePortArrayIndex + "]"); 						
 				}
 			} 
 			return sb.toString();

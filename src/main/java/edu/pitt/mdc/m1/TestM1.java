@@ -31,7 +31,7 @@ public class TestM1 {
 		//runOnMdcSubset("small-set");
 		runOnMdcSubset("restricted");
 		//runOnMdcSubset("limited");
-		runOnMdcSubset("curated");
+		runOnMdcSubset("precision-eval");
     }
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
@@ -269,7 +269,8 @@ public class TestM1 {
  			}
  		}
 
- 		System.out.print("Ids of unique software across all graphs:\n\t");
+ 		System.out.print("Number of unique software across all graphs: " +
+ 				uniqueSoftwareIds.size() + ":\n\t");
  		for (Integer id : uniqueSoftwareIds) {
  			System.out.print(id + ", ");
  		}
