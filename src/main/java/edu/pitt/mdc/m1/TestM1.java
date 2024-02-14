@@ -31,7 +31,8 @@ public class TestM1 {
 		//runOnMdcSubset("small-set");
 		runOnMdcSubset("restricted");
 		//runOnMdcSubset("limited");
-		runOnMdcSubset("precision-eval");
+		//runOnMdcSubset("precision-eval");
+		runOnMdcSubset("curated");
     }
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
