@@ -404,8 +404,22 @@ public class GenerateAndTest {
 		}
 
 		public static boolean isAbstractWorkflow(MutableValueGraph<Node, Integer> g) {
-			if (getUnboundGraphInputs(g).isEmpty()) return false;
-			else return true; }
+			ArrayList<UnboundGraphInput> ugiList = getUnboundGraphInputs(g);
+			if (ugiList.isEmpty()) return false;
+
+			/*
+				If any ugi is associated with non-data-service, then it's abstract
+
+				So any false value to call of isDataService() will result in
+					!isDataService() evaluating to true, and the entire
+					disjunct is true, and so the graph is abstract.
+			*/
+			boolean isAbstract = false;
+			for (UnboundGraphInput ugi : ugiList) {
+				isAbstract = isAbstract || !sddfr.isDataService(ugi.getSoftwareId());
+			}
+			return isAbstract;
+		}
 
 		public static boolean hasUnboundGraphOutputs(MutableValueGraph<Node, Integer> g) {
 			if (getUnboundGraphOutputList(g).isEmpty()) return false;

@@ -60,6 +60,7 @@ public class SoftwareDatasetDataFormatRepository {
 			objectList2.add(new Dataset("Dataset 200", 200, 2));
 			objectList2.add(new Dataset("Dataset 201", 201, 2));
 			objectList2.add(new Dataset("Dataset 202", 202, 2));
+			objectList2.add(new Software("Software 2003", 1002, PortType.OUTPUT, 0, 2));
 			objectList2.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0, 2));
 		formatToObjectList.put(Integer.valueOf(2), objectList2);	
 		
@@ -127,7 +128,11 @@ public class SoftwareDatasetDataFormatRepository {
 		ArrayList<Software> softwareList6 = new ArrayList<Software>();
 			softwareList6.add(new Software("Software 2001", 2001, PortType.INPUT, 0, 6)); 
 			softwareList6.add(new Software("Software 2002", 2002, PortType.INPUT, 0, 6)); //making this input port multi-data-format (3 and 6)
-		formatToSoftwareList.put(Integer.valueOf(6), softwareList6);			
+		formatToSoftwareList.put(Integer.valueOf(6), softwareList6);	
+
+		ArrayList<Software> softwareList7 = new ArrayList<Software>();
+			softwareList7.add(new Software("Software 2003", 2003, PortType.INPUT, 0, 1));  		
+		formatToSoftwareList.put(Integer.valueOf(7), softwareList7);
 		
 		return formatToSoftwareList;			
 	}
@@ -189,6 +194,10 @@ public class SoftwareDatasetDataFormatRepository {
 			//software.add(60);
 		softwareIdToInputFormatIds.put(Integer.valueOf(2002), inputsAndFormats2002);
 		
+		ArrayList<ArrayList<Integer>> inputsAndFormats2003 = new ArrayList<ArrayList<Integer>>();
+			inputsAndFormats2003.add(new ArrayList<Integer>(Arrays.asList(7)));
+		softwareIdToInputFormatIds.put(Integer.valueOf(2003), inputsAndFormats2003);
+		
 		return softwareIdToInputFormatIds;
 	}
 		// *** DO NOT DELETE makeSoftwareNode uses this method ****
@@ -237,6 +246,10 @@ public class SoftwareDatasetDataFormatRepository {
 		ArrayList<ArrayList<Integer>> outputsAndFormats2002 = new ArrayList<ArrayList<Integer>>();
 		//	outputsAndFormats2002.add(2);
 		softwareIdToOutputFormatIds.put(Integer.valueOf(2002), outputsAndFormats2002);
+
+		ArrayList<ArrayList<Integer>> outputsAndFormats2003 = new ArrayList<ArrayList<Integer>>();
+			outputsAndFormats2003.add(new ArrayList<Integer>(Arrays.asList(2)));
+		softwareIdToOutputFormatIds.put(Integer.valueOf(2003), outputsAndFormats2003);
 	
 		return softwareIdToOutputFormatIds;	
 	}
@@ -342,7 +355,7 @@ public class SoftwareDatasetDataFormatRepository {
 	}		
 
 	public static ArrayList<Integer> createDataServicesTestCollection() {
-		ArrayList<Integer> dataServices = new ArrayList<Integer>(Arrays.asList(1000));
+		ArrayList<Integer> dataServices = new ArrayList<Integer>(Arrays.asList(2003));
 		return dataServices;
 	}
 	
