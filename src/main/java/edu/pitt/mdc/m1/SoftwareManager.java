@@ -24,6 +24,7 @@ public class SoftwareManager {
 	HashMap<Integer, ArrayList<SoftwareNode>> softwareByOutputFormatId =
 		new HashMap<Integer, ArrayList<SoftwareNode>>();
 	HashMap<Integer, SoftwareNode> idToSoftwareNode;
+	ArrayList<Integer> dataServicesIds;
 	
 	public void loadFromJsonFile(File f) {
 		try {
@@ -31,6 +32,7 @@ public class SoftwareManager {
 			JsonReader jr = new JsonReader(fr);
 			JsonElement je = JsonParser.parseReader(jr);
 			Gson gs = new Gson();
+			dataServicesIds = new ArrayList<Integer>();
 			if (je.isJsonArray()) {
 				JsonArray ja = je.getAsJsonArray();
 				Iterator<JsonElement> i = ja.iterator();
@@ -41,11 +43,18 @@ public class SoftwareManager {
 
 						JsonPrimitive idJp = jo.getAsJsonPrimitive("id");
 						JsonPrimitive titleJp = jo.getAsJsonPrimitive("title");
+						JsonPrimitive typeJp = jo.getAsJsonPrimitive("subtype");
 						JsonArray inputsJa = jo.getAsJsonArray("inputs");
 						JsonArray outputsJa = jo.getAsJsonArray("outputs");
 
 						int id = idJp.getAsInt();
 						String title = titleJp.getAsString();
+						if (typeJp != null) {
+							String subtype = typeJp.getAsString();
+							if (subtype.equals("DataService")) {
+								dataServicesIds.add(id);
+							}
+						}
 
 						SoftwareNode sn = new SoftwareNode(id);
 						sn.title = title;

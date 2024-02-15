@@ -12,6 +12,7 @@ public class SoftwareDatasetDataFormatRepository {
 	HashMap<Integer, ArrayList<Software>> softwareList;
 	HashMap<Integer, ArrayList<ArrayList<Integer>>> inputsAndFormats;
 	HashMap<Integer, ArrayList<ArrayList<Integer>>> outputsAndFormats;
+	ArrayList<Integer> dataServices;
 
 	public static SoftwareDatasetDataFormatRepository createTestCollectionInstance() {
 		SoftwareDatasetDataFormatRepository testCollection = 
@@ -20,6 +21,7 @@ public class SoftwareDatasetDataFormatRepository {
 		testCollection.softwareList = createSoftwareListTestCollection();
 		testCollection.inputsAndFormats = createInputsAndFormatsTestCollection();
 		testCollection.outputsAndFormats = createOutputsAndFormatsTestCollection();
+		testCollection.dataServices = createDataServicesTestCollection();
 		return testCollection;
 	}
 
@@ -34,6 +36,7 @@ public class SoftwareDatasetDataFormatRepository {
 		SoftwareManager sm) {
 		buildObjectList(dm, sm); //also builds outputsAndFormats
 		buildSoftwareList(sm);   //also builds inputsAndFormats
+		this.dataServices = sm.dataServicesIds;
 	}
 
 	public static HashMap<Integer, ArrayList<DigitalResearchObject>> createObjectListTestCollection() {
@@ -337,10 +340,14 @@ public class SoftwareDatasetDataFormatRepository {
 			this.inputsAndFormats.put(id, snInputsAndFormats);
 		}
 	}		
+
+	public static ArrayList<Integer> createDataServicesTestCollection() {
+		ArrayList<Integer> dataServices = new ArrayList<Integer>(Arrays.asList(1000));
+		return dataServices;
+	}
 	
 	public boolean isDataService(Integer softwareId) {
-		ArrayList<Integer> dataServices = new ArrayList<Integer>(Arrays.asList(1000));
-		if (dataServices.contains(softwareId))                      
+		if (this.dataServices.contains(softwareId))                      
 			return true;
 		else
 			return false;

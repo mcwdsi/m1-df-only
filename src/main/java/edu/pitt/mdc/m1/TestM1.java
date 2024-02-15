@@ -28,10 +28,10 @@ public class TestM1 {
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
-		runOnMdcSubset("small-set");
+		//runOnMdcSubset("small-set");
 		runOnMdcSubset("restricted");
-		runOnMdcSubset("limited");
-		runOnMdcSubset("precision-eval");
+		//runOnMdcSubset("limited");
+		//runOnMdcSubset("precision-eval");
 		runOnMdcSubset("curated");
     }
 
