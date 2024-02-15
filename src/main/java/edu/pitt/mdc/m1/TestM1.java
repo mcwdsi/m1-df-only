@@ -83,10 +83,11 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			if(GenerateAndTest.isAbstractWorkflow(g)) 
+			if(GenerateAndTest.isBackwardsExtendableWorkflow(g)) 
 				GenerateAndTest.backSearch(g);
-			else
+			if (!GenerateAndTest.isAbstractWorkflow(g)) {
 				GenerateAndTest.forwardSearch(g);
+			}
 		}
 
 		postProcessGraphs();
@@ -118,10 +119,11 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 
 			//branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			if(GenerateAndTest.isAbstractWorkflow(g)) 
+			if(GenerateAndTest.isBackwardsExtendableWorkflow(g)) 
 				GenerateAndTest.backSearch(g);
-			else
+			if (!GenerateAndTest.isAbstractWorkflow(g)) {
 				GenerateAndTest.forwardSearch(g);
+			}
 		}
 
 		postProcessGraphs();

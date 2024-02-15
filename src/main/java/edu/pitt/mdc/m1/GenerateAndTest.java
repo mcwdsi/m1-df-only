@@ -382,7 +382,7 @@ public class GenerateAndTest {
 			while (iter2.hasNext()) g1.addNode(iter2.next());
 
 
-			if (isAbstractWorkflow(g1)) {
+			if (isBackwardsExtendableWorkflow(g1)) {
 				int graphSize = gList.size() + 1;
 				//System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
 				//if (graphSize == 126) {
@@ -390,8 +390,8 @@ public class GenerateAndTest {
 				//}
 				backSearch(g1);
 			} 
-			else { // it is a concrete workflow, so we add it to gList and print it
-				if (gList == null) gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+
+			if (!isAbstractWorkflow(g1)) {
 				gList.add(g1); 
 				System.out.println("\n" + gList.size() + ". New Graph composed during backSearch()");	
 				printGraph(g1);
@@ -419,6 +419,10 @@ public class GenerateAndTest {
 				isAbstract = isAbstract || !sddfr.isDataService(ugi.getSoftwareId());
 			}
 			return isAbstract;
+		}
+
+		public static boolean isBackwardsExtendableWorkflow(MutableValueGraph<Node, Integer> g) {
+			return !getUnboundGraphInputs(g).isEmpty();
 		}
 
 		public static boolean hasUnboundGraphOutputs(MutableValueGraph<Node, Integer> g) {

@@ -60,7 +60,7 @@ public class SoftwareDatasetDataFormatRepository {
 			objectList2.add(new Dataset("Dataset 200", 200, 2));
 			objectList2.add(new Dataset("Dataset 201", 201, 2));
 			objectList2.add(new Dataset("Dataset 202", 202, 2));
-			objectList2.add(new Software("Software 2003", 1002, PortType.OUTPUT, 0, 2));
+			objectList2.add(new Software("Software 2003", 2003, PortType.OUTPUT, 0, 2));
 			objectList2.add(new Software("Software 2000", 2000, PortType.OUTPUT, 0, 2));
 		formatToObjectList.put(Integer.valueOf(2), objectList2);	
 		
