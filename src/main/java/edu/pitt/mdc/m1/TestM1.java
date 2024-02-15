@@ -97,70 +97,7 @@ public class TestM1 {
 
 		}
 
-		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
-		HashSet<String> graphStringSet = new HashSet<String>();
-		ArrayList<MutableValueGraph<Node, Integer>> gListDeDuplicated = 
-			new ArrayList<MutableValueGraph<Node, Integer>>();
-		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
-			boolean added = graphStringSet.add(GenerateAndTest.graphToString(gi));
-			//System.out.println(added);
-			if (added)
-				gListDeDuplicated.add(gi);
-		}
-	
-		System.out.println("Number of unique graph strings: " + graphStringSet.size());
-
-		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = deduplicateGraphs(GenerateAndTest.gList);
-		System.out.println("\n\nDEDUPLICATED GRAPHS SIZE: " + gListDeDup.size());
-
-		ArrayList<String> dedupStrings = generateSortedGraphStrings(gListDeDup);
-		System.out.println("DEDUPLICATED GRAPHS STRING LIST SIZE: " + dedupStrings.size() + "\n\n");
-
-		System.out.println("BEGIN GRAPH STRING SET");
-		ArrayList<String> graphStringsAsList = new ArrayList<String>();
-		graphStringsAsList.addAll(graphStringSet);
-		Collections.sort(graphStringsAsList);
-		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
-		System.out.println("END GRAPH STRING SET");
-
-
-		Iterator<String> deDupIter = dedupStrings.iterator();
-		Iterator<String> stringIter = graphStringsAsList.iterator();
-		while (deDupIter.hasNext()) {
-			String deDupNext = deDupIter.next();
-			String sNext = stringIter.next();
-			if (!deDupNext.equals(sNext)) {
-				System.err.println("\nStrings not equal!\n" + sNext + "\n\n" + deDupNext);
-			}
-		}
-
-		generateSummaryStatistics(gListDeDup);
-		
-		/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
-		ArrayList<MutableValueGraph<Node, Integer>> gList;
-		gList =GenerateAndTestGuava.getGraphList(); 
-			
-		System.out.println("Number of graphs = " + gList.size());
-		System.out.println("Size distribution (number of software nodes)");
-		
-		Iterator<MutableValueGraph<Node, Integer>> iter = gList.iterator();
-		
-		MutableValueGraph<Node, Integer> g;
-		
-		// ndc means nodeCountDistribution
-		ArrayList<Integer> ndc = new ArrayList<Integer>();
-		// initialize with zero counts
-		
-		int nc;  //nodecount
-		int previousNc;
-		while (iter.hasNext() ) {
-			g = iter.next();
-			nc = g.nodes().size();
-			previousNc = ndc.get(nc);
-			ndc.set(nc,++previousNc);
-
-		}
-	*/	
+		postProcessGraphs();
 	}
 
 	public static void runOnMdcSubset(String subsetName) {
@@ -190,18 +127,11 @@ public class TestM1 {
 			GenerateAndTest.backSearch(g);
 		}
 
-		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
-		HashSet<String> graphStringSet = new HashSet<String>();
-		ArrayList<MutableValueGraph<Node, Integer>> gListDeDuplicated = 
-			new ArrayList<MutableValueGraph<Node, Integer>>();
-		for (MutableValueGraph<Node, Integer> gi : GenerateAndTest.gList) {
-			boolean added = graphStringSet.add(GenerateAndTest.graphToString(gi));
-			//System.out.println(added);
-			if (added)
-				gListDeDuplicated.add(gi);
-		}
-	
-		System.out.println("Number of unique graph strings: " + graphStringSet.size());
+		postProcessGraphs();
+	}
+
+	public static void postProcessGraphs() {	
+				System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 
 		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = deduplicateGraphs(GenerateAndTest.gList);
 		System.out.println("\n\nDEDUPLICATED GRAPHS SIZE: " + gListDeDup.size());
@@ -210,22 +140,8 @@ public class TestM1 {
 		System.out.println("DEDUPLICATED GRAPHS STRING LIST SIZE: " + dedupStrings.size() + "\n\n");
 
 		System.out.println("BEGIN GRAPH STRING SET");
-		ArrayList<String> graphStringsAsList = new ArrayList<String>();
-		graphStringsAsList.addAll(graphStringSet);
-		Collections.sort(graphStringsAsList);
-		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
+		for (String gs : dedupStrings) { System.out.println(gs); }
 		System.out.println("END GRAPH STRING SET");
-
-
-		Iterator<String> deDupIter = dedupStrings.iterator();
-		Iterator<String> stringIter = graphStringsAsList.iterator();
-		while (deDupIter.hasNext()) {
-			String deDupNext = deDupIter.next();
-			String sNext = stringIter.next();
-			if (!deDupNext.equals(sNext)) {
-				System.err.println("\nStrings not equal!\n" + sNext + "\n\n" + deDupNext);
-			}
-		}
 
 		generateSummaryStatistics(gListDeDup);
 	}

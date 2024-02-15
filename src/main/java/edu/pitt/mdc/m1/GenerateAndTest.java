@@ -470,7 +470,10 @@ public class GenerateAndTest {
 				Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
 				Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
 				String softwareInfo = s.uid + " (" + s.title + ")";
-				sb.append(" Software " + softwareInfo);
+				sb.append("***");
+				sb.append("Software ");
+				sb.append(softwareInfo);
+				sb.append("*** ");
 
 				while (iterIp.hasNext())  {
 					SoftwarePort p = iterIp.next();
@@ -502,15 +505,16 @@ public class GenerateAndTest {
 							", Inport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());					
 					}
 				}
+				sb.append("   ");
 				nodeString.add(sb.toString());
 			} 
 			Collections.sort(nodeString);
 
 			StringBuilder sb2 = new StringBuilder();
 			for (String ns : nodeString) {
-				sb2.append("***");
+				//sb2.append("+++");
 				sb2.append(ns);
-				sb2.append("***   ");
+				//sb2.append("+++   ");
 			}
 			return sb2.toString();
 		}
