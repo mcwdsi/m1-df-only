@@ -28,10 +28,10 @@ public class TestM1 {
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
-		//runOnMdcSubset("small-set");
+		runOnMdcSubset("small-set");
 		runOnMdcSubset("restricted");
-		//runOnMdcSubset("limited");
-		//runOnMdcSubset("precision-eval");
+		runOnMdcSubset("limited");
+		runOnMdcSubset("precision-eval");
 		runOnMdcSubset("curated");
     }
 
@@ -41,6 +41,8 @@ public class TestM1 {
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
 		GenerateAndTest.sddfr = sddfr;
+		ArrayList<MutableValueGraph<Node, Integer>> gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+		GenerateAndTest.gList = gList;
 		while(iterSoftwareList.hasNext()) {
 			int softwareID = iterSoftwareList.next();
 			SoftwareNode s = new SoftwareNode(softwareID);
@@ -93,8 +95,7 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
 			GenerateAndTest.backSearch(g);
-
-
+			GenerateAndTest.forwardSearch(g);
 		}
 
 		postProcessGraphs();
@@ -108,7 +109,8 @@ public class TestM1 {
 		SoftwareDatasetDataFormatRepository sddfr = 
 			new SoftwareDatasetDataFormatRepository(dm, sm);
 
-		GenerateAndTest.gList = null;
+		ArrayList<MutableValueGraph<Node, Integer>> gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+		GenerateAndTest.gList = gList;
 		GenerateAndTest.sddfr = sddfr;
 		GenerateAndTest.sm = sm;
 		GenerateAndTest.dm = dm;
@@ -125,13 +127,14 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
 			GenerateAndTest.backSearch(g);
+			GenerateAndTest.forwardSearch(g);
 		}
 
 		postProcessGraphs();
 	}
 
 	public static void postProcessGraphs() {	
-				System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
+		System.out.println("Number of graphs generated: " + GenerateAndTest.gList.size());
 
 		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = deduplicateGraphs(GenerateAndTest.gList);
 		System.out.println("\n\nDEDUPLICATED GRAPHS SIZE: " + gListDeDup.size());

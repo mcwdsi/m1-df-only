@@ -384,10 +384,10 @@ public class GenerateAndTest {
 
 			if (isAbstractWorkflow(g1)) {
 				int graphSize = gList.size() + 1;
-				System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
-				if (graphSize == 126) {
-					printGraph(g1);
-				}
+				//System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
+				//if (graphSize == 126) {
+				//	printGraph(g1);
+				//}
 				backSearch(g1);
 			} 
 			else { // it is a concrete workflow, so we add it to gList and print it
