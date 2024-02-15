@@ -337,4 +337,12 @@ public class SoftwareDatasetDataFormatRepository {
 			this.inputsAndFormats.put(id, snInputsAndFormats);
 		}
 	}		
+	
+	public boolean isDataService(Integer softwareId) {
+		ArrayList<Integer> dataServices = new ArrayList<Integer>(Arrays.asList(1000));
+		if (dataServices.contains(softwareId))                      
+			return true;
+		else
+			return false;
+	}
 }
