@@ -63,18 +63,6 @@ public class TestM1 {
 				s.inputPorts.add(p);
 			}
 			
-			// have to hack any multiDF ports. Here's where we replace inport DF list.
-			// Specifically, we replace the one-DF list of dataformats for SoftwareNode 2002 input[0] with a list of data formats 3 and 6
-			/*
-			I moved this to creation of test repository in SoftwareDatasetDataFomratRepository
-			if(softwareID==2002) {
-				ArrayList<Integer> x = new ArrayList<Integer>();
-				x.add(3);
-				x.add(6);
-				s.inputPorts.get(0).setDataFormats(x);;
-			}
-			*/
-			
 			portCtr = 0;
 			while (iterO.hasNext()) {
 				portDataFormats = iterO.next();
@@ -91,10 +79,11 @@ public class TestM1 {
 			System.out.println("SOFTWARE " + softwareID + " is triggering M1 search:");
 			System.out.println("***********************************");
 			GenerateAndTest.printGraph(g);
-			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			GenerateAndTest.backSearch(g);
-
-
+			
+			if(GenerateAndTest.isAbstractWorkflow(g)) 
+				GenerateAndTest.backSearch(g);
+			else
+				GenerateAndTest.forwardSearch(g);
 		}
 
 		postProcessGraphs();
@@ -123,8 +112,11 @@ public class TestM1 {
 			System.out.println("SOFTWARE " + softwareID + " (" + softwareTitle + ") is triggering M1 search:");
 			System.out.println("***********************************");
 			GenerateAndTest.printGraph(g);
-			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			GenerateAndTest.backSearch(g);
+			//branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
+			if(GenerateAndTest.isAbstractWorkflow(g)) 
+				GenerateAndTest.backSearch(g);
+			else
+				GenerateAndTest.forwardSearch(g);
 		}
 
 		postProcessGraphs();
