@@ -110,6 +110,12 @@ public class TestM1 {
 	
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
+		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = deduplicateGraphs(GenerateAndTest.gList);
+		System.out.println("\n\nDEDUPLICATED GRAPHS SIZE: " + gListDeDup.size());
+
+		ArrayList<String> dedupStrings = generateSortedGraphStrings(gListDeDup);
+		System.out.println("DEDUPLICATED GRAPHS STRING LIST SIZE: " + dedupStrings.size() + "\n\n");
+
 		System.out.println("BEGIN GRAPH STRING SET");
 		ArrayList<String> graphStringsAsList = new ArrayList<String>();
 		graphStringsAsList.addAll(graphStringSet);
@@ -117,7 +123,18 @@ public class TestM1 {
 		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
 		System.out.println("END GRAPH STRING SET");
 
-		generateSummaryStatistics(gListDeDuplicated);
+
+		Iterator<String> deDupIter = dedupStrings.iterator();
+		Iterator<String> stringIter = graphStringsAsList.iterator();
+		while (deDupIter.hasNext()) {
+			String deDupNext = deDupIter.next();
+			String sNext = stringIter.next();
+			if (!deDupNext.equals(sNext)) {
+				System.err.println("\nStrings not equal!\n" + sNext + "\n\n" + deDupNext);
+			}
+		}
+
+		generateSummaryStatistics(gListDeDup);
 		
 		/*	System.out.println("\n\n***** SEARCH STATISTICS *********");
 		ArrayList<MutableValueGraph<Node, Integer>> gList;
@@ -186,6 +203,12 @@ public class TestM1 {
 	
 		System.out.println("Number of unique graph strings: " + graphStringSet.size());
 
+		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = deduplicateGraphs(GenerateAndTest.gList);
+		System.out.println("\n\nDEDUPLICATED GRAPHS SIZE: " + gListDeDup.size());
+
+		ArrayList<String> dedupStrings = generateSortedGraphStrings(gListDeDup);
+		System.out.println("DEDUPLICATED GRAPHS STRING LIST SIZE: " + dedupStrings.size() + "\n\n");
+
 		System.out.println("BEGIN GRAPH STRING SET");
 		ArrayList<String> graphStringsAsList = new ArrayList<String>();
 		graphStringsAsList.addAll(graphStringSet);
@@ -193,7 +216,18 @@ public class TestM1 {
 		for (String gs : graphStringsAsList) { System.out.println("\t" + gs); }
 		System.out.println("END GRAPH STRING SET");
 
-		generateSummaryStatistics(gListDeDuplicated);
+
+		Iterator<String> deDupIter = dedupStrings.iterator();
+		Iterator<String> stringIter = graphStringsAsList.iterator();
+		while (deDupIter.hasNext()) {
+			String deDupNext = deDupIter.next();
+			String sNext = stringIter.next();
+			if (!deDupNext.equals(sNext)) {
+				System.err.println("\nStrings not equal!\n" + sNext + "\n\n" + deDupNext);
+			}
+		}
+
+		generateSummaryStatistics(gListDeDup);
 	}
 
 	public static DatasetManager loadDatasets(String fileName) {
@@ -286,6 +320,40 @@ public class TestM1 {
  			Integer numGraphs = numberOfNodesToNumberOfGraphs.get(i);
  			System.out.println("There are " + numGraphs + " graphs with " + i + " nodes.");
  		}
+ 	}
+
+ 	public static ArrayList<MutableValueGraph<Node, Integer>> deduplicateGraphs(
+ 		ArrayList<MutableValueGraph<Node, Integer>> gList) {
+ 		
+ 		ArrayList<MutableValueGraph<Node, Integer>> gListDeDup = 
+ 			new ArrayList<MutableValueGraph<Node,Integer>>();
+
+ 		for (MutableValueGraph<Node,Integer> gNext : gList) {
+ 			if (gListDeDup.isEmpty()) {
+ 				gListDeDup.add(gNext);
+ 			} else {
+ 				boolean add = true;
+ 				for (MutableValueGraph<Node, Integer> gDeDupNext : gListDeDup) {
+ 					add = add && !GenerateAndTest.graphsAreEqual(gNext, gDeDupNext);
+ 				}
+ 				if (add) {
+ 					gListDeDup.add(gNext);
+ 				}
+ 			}
+ 		}
+ 		return gListDeDup;
+ 	}
+
+ 	public static ArrayList<String> generateSortedGraphStrings(
+ 		ArrayList<MutableValueGraph<Node, Integer>> gList) {
+		
+		ArrayList<String> graphStrings = new ArrayList<String>();
+		for (MutableValueGraph<Node, Integer> gi : gList) {
+			graphStrings.add(GenerateAndTest.graphToString(gi));
+		}
+
+		Collections.sort(graphStrings);
+		return graphStrings;
  	}
 
 }

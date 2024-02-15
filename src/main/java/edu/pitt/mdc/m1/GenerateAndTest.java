@@ -110,6 +110,29 @@ public class GenerateAndTest {
 		return true;
 	}
 
+	public static boolean graphsAreEqual(MutableValueGraph<Node, Integer> g1, MutableValueGraph<Node, Integer> g2) {
+		int g1NumNodes = g1.nodes().size();
+		int g2NumNodes = g2.nodes().size();
+		boolean eq = g1NumNodes == g2NumNodes;
+		if (eq) {
+			Set<Node> g1Nodes = g1.nodes();
+			Set<Node> g2Nodes = g2.nodes();
+			ArrayList<Node> g1NodeArray = new ArrayList<Node>();
+			g1NodeArray.addAll(g1Nodes);
+			ArrayList<Node> g2NodeArray = new ArrayList<Node>();
+			g2NodeArray.addAll(g2Nodes);
+			for (int i=0; i<g1NumNodes; i++) {
+				boolean g1NodeInG2 = false;
+				for (int j=0; j<g2NumNodes; j++) {
+					g1NodeInG2 = g1NodeInG2 || g1NodeArray.get(i).equals(g2NodeArray.get(j));
+				}
+				eq = eq && g1NodeInG2;
+				if (!eq) break;
+			}
+		}
+		return eq;
+	}
+
 
 	// backSearch is called with abstract workflows.  
 	// It searches to instantiate all uninstantiated software inputs in the workflow, grounding out in datasets, 
@@ -433,8 +456,6 @@ public class GenerateAndTest {
 		}
 
 		public static String graphToString(MutableValueGraph<Node, Integer> g) {
-			StringBuilder sb = new StringBuilder();
-
 			ArrayList<Node> nodeList = new ArrayList<Node>();
 			nodeList.addAll(g.nodes());
 			Collections.sort(nodeList);
@@ -442,7 +463,9 @@ public class GenerateAndTest {
 			Iterator<Node> iter = nodeList.iterator();
 			SoftwareNode s;
 
+			ArrayList<String> nodeString = new ArrayList<String>();
 			while (iter.hasNext()) {  
+				StringBuilder sb = new StringBuilder();
 				s = (SoftwareNode) iter.next();
 				Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
 				Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
@@ -479,9 +502,20 @@ public class GenerateAndTest {
 							", Inport[" + p.boundToSoftwarePortArrayIndex + "] via data format " + p.getBoundViaDataFormatId());					
 					}
 				}
+				nodeString.add(sb.toString());
 			} 
-			return sb.toString();
+			Collections.sort(nodeString);
+
+			StringBuilder sb2 = new StringBuilder();
+			for (String ns : nodeString) {
+				sb2.append("***");
+				sb2.append(ns);
+				sb2.append("***   ");
+			}
+			return sb2.toString();
 		}
+
+
 
 		public static ArrayList<MutableValueGraph<Node, Integer>> getGraphList() {
 			return gList;
@@ -527,7 +561,7 @@ public class GenerateAndTest {
 				Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();
 				while(iterIP.hasNext()){
 					ip = iterIP.next();
-					ip1 = new SoftwarePort(ip.softwareID, ip.type, ip.dataFormatIds);
+					ip1 = new SoftwarePort(ip.softwareID, ip.type, ip.getDataFormats());
 
 					ip1.setPortId(ip.getPortId());
 					ip1.setBoundToObjectId(ip.getBoundToObjectId());				
@@ -540,7 +574,7 @@ public class GenerateAndTest {
 				Iterator<SoftwarePort> iterOP = s.outputPorts.iterator();
 				while(iterOP.hasNext()){
 					op = iterOP.next();
-					op1 = new SoftwarePort(op.softwareID, op.type, op.dataFormatIds);
+					op1 = new SoftwarePort(op.softwareID, op.type, op.getDataFormats());
 
 					op1.setPortId(op.getPortId());
 					op1.setBoundToObjectId(op.getBoundToObjectId());				

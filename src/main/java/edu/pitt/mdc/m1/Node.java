@@ -12,6 +12,7 @@ public class Node implements Comparable<Node> {
 	 	return this.uid;
 	 }
 
+	 @Override
 	 public boolean equals(Object o) {
 	 	return (o instanceof Node) && ((Node)o).uid == this.uid;
 	 }
