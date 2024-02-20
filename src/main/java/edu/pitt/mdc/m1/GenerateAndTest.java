@@ -12,27 +12,6 @@ public class GenerateAndTest {
 	// gList accumulates the graphs composed by M1
 	static ArrayList<MutableValueGraph<Node, Integer>> gList = null;
 
-	// forwardSearch is called on concrete workflows, whose only unbound ports are output ports.  
-	// forwardSearch extends the workflows by instantiating uninstantiated software outputs with additional software
-	// The secret to forwardSearch() is that it distinguishes between the addition of single-input software -- 
-	// which it can do depth first by calling itself recursively -- and the addition of multi-input software, for which it requires
-	// the assistance of backSearch() to determine whether the additional inputs of the added software can be satisfied.
-
-	/* Pseudocode for forwardSearch
-	 * For each uninstantiated output node {
-			If DF-match-list.isEmpty() {}
-			Else {
-				For each item on the DF-match list {
-				g1 = clone(g)create a clone of g. 
-				g1.add(softwareNode)
-				if (softwareNode has exactly 1 input port)
-					forwardSearch(g1);
-				else
-					backSearch(g1);
-						} //next item
-					} //next uninstantiated output node;
-	 */	
-
 	public static boolean forwardSearch(MutableValueGraph<Node, Integer> g)
 	{	
 		UnboundGraphOutput ugo;	// will point to a specific unbound output SoftwarePort in a SoftwareNode in graph g
@@ -94,7 +73,7 @@ public class GenerateAndTest {
 					g1.addNode(ms);		
 
 					// if the added software only has one input, then the graph has no unbound input and qualifies as a new workflow, so add it to gList and print it to Std Out.
-					if (ms.numInputs()==1) {
+					if (ms.numInputs()==1 && test(g1)) {
 						gList.add(g1);
 						System.out.println("\n" + gList.size() + ". New Graph composed during forwardSearch()");	
 
@@ -391,7 +370,7 @@ public class GenerateAndTest {
 				backSearch(g1);
 			} 
 
-			if (!isAbstractWorkflow(g1)) {
+			if (!isAbstractWorkflow(g1) && test(g1)) {
 				gList.add(g1); 
 				System.out.println("\n" + gList.size() + ". New Graph composed during backSearch()");	
 				printGraph(g1);
@@ -401,6 +380,10 @@ public class GenerateAndTest {
 					forwardSearch(g1);
 				}
 			}
+		}
+
+		public static boolean test(MutableValueGraph<Node, Integer> g) {
+			return true;
 		}
 
 		public static boolean isAbstractWorkflow(MutableValueGraph<Node, Integer> g) {
