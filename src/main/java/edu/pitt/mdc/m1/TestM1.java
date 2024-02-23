@@ -27,16 +27,38 @@ public class TestM1 {
 	public static void main(String args[]) throws CloneNotSupportedException
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
-		runOnTestCollection();
-		runOnMdcSubset("small-set");
-		runOnMdcSubset("restricted");
+		//runOnTestCollection();
+		runDatasetsOnTestCollection();
+		//runOnMdcSubset("small-set");  //restore to active
+		//runOnMdcSubset("restricted"); //restor to active when done
 		//runOnMdcSubset("limited");
 		//runOnMdcSubset("precision-eval");
-		runOnMdcSubset("curated2");
+		//runOnMdcSubset("curated2");   // restore to active when done
     }
+	
+	public static void runDatasetsOnTestCollection() throws CloneNotSupportedException {
+		// loop through datasets to test M1's ability to seed search w/ a new dataset
+		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
+		GenerateAndTest.sddfr = sddfr;
+		ArrayList<MutableValueGraph<Node, Integer>> gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+		GenerateAndTest.gList = gList;
+		
+	   	// run datasets as new datasets
+		ArrayList<Integer> datasetList = new ArrayList<>(Arrays.asList(200,300,400,600)); // (200,201,202,300,301,302,400,600)
+		Iterator<Integer> iterDatasetList = datasetList.iterator();
+		Integer datasetId;
+		while(iterDatasetList.hasNext()) {
+			datasetId = iterDatasetList.next();
+			System.out.println("***********************************");
+			System.out.println("DATASET " + datasetId + " is triggering M1 search:");
+			System.out.println("***********************************");
+			GenerateAndTest.forwardSearchFromDataset(datasetId);
+		}
+	}
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
-		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
+    	
+    	// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
 		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList( 1000,1001,1002,2000, 2001, 2002, 2002, 2003)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
@@ -91,6 +113,7 @@ public class TestM1 {
 		}
 
 		postProcessGraphs();
+
 	}
 
 	public static void runOnMdcSubset(String subsetName) {

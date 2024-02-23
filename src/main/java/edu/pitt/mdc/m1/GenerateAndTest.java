@@ -88,6 +88,38 @@ public class GenerateAndTest {
 		}
 		return true;
 	}
+	
+	
+	public static boolean forwardSearchFromDataset(Integer datasetId) {
+		MutableValueGraph<Node, Integer>  g;
+
+		ArrayList<Software> dfMatchingSoftwareList; 
+		Integer dataFormatId = (Integer)datasetId/100;  // Hack only works for Test collection  
+		dfMatchingSoftwareList = sddfr.softwareByInputDataformat(dataFormatId); //exactly how forwardSearch gets a list
+		Iterator<Software> dfmsIter = dfMatchingSoftwareList.iterator();
+
+		if (!dfMatchingSoftwareList.isEmpty()) { 
+			//For each instance of Software in dfMatchSoftware
+			Software dfms;  // a data-format matching instance of Software
+			SoftwareNode sn; // an instance of SoftwareNode
+			while(dfmsIter.hasNext()) {
+				dfms = dfmsIter.next();
+				sn = makeSoftwareNode(dfms.rdoId);
+
+				//dfms knows which sn inport connects to the dataset 
+				sn.inputPorts.get(dfms.portNumber).setBoundToObjectId(datasetId);  		
+				g = ValueGraphBuilder.directed().build();
+				g.addNode(sn);
+
+				//If s has exactly one input port,
+				if (sn.inputPorts.size()==1)
+					forwardSearch(g); 
+				else
+					backSearch(g);
+			}
+		}
+		return(true);
+	}
 
 	public static boolean graphsAreEqual(MutableValueGraph<Node, Integer> g1, MutableValueGraph<Node, Integer> g2) {
 		int g1NumNodes = g1.nodes().size();
