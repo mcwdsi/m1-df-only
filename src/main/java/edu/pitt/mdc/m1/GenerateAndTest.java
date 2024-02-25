@@ -383,7 +383,7 @@ public class GenerateAndTest {
 
 
 			if (isAbstractWorkflow(g1)) {
-				int graphSize = gList.size() + 1;
+				//int graphSize = gList.size() + 1;
 				//System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
 				//if (graphSize == 126) {
 				//	printGraph(g1);
@@ -391,7 +391,7 @@ public class GenerateAndTest {
 				backSearch(g1);
 			} 
 			else { // it is a concrete workflow, so we add it to gList and print it
-				if (gList == null) gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+				//if (gList == null) gList = new ArrayList<MutableValueGraph<Node, Integer>>();
 				gList.add(g1); 
 				System.out.println("\n" + gList.size() + ". New Graph composed during backSearch()");	
 				printGraph(g1);
