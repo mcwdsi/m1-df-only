@@ -6,6 +6,10 @@ import java.util.ArrayList;
 // toBindTo doesn't exactly define what the input port is supposed to bind to when the target is a multi-DF outport (i.e. one w/subports)
 // TODO: to handle has to specify the subport
 public class UnboundGraphInput {
+	SoftwareNode node;
+	int arrayIndexOfPort;  // the array index of the unbound input port in the software
+	ArrayList<Integer> dataFormatIds;  // the data format UIDs for the unbound input port
+	DigitalResearchObject objectToBindTo;  // an object containing essential info about the dataset or software that M1 has selected for binding to the unbound graph input
 
 	public ArrayList<Integer> getDataFormatIds() {
 		return dataFormatIds;
@@ -15,13 +19,8 @@ public class UnboundGraphInput {
 		this.dataFormatIds = dataFormatIds;
 	}
 
-	Integer softwareId;    // the UID of the software in the graph with the unbound input port
-	int arrayIndexOfPort;  // the array index of the unbound input port in the software
-	ArrayList<Integer> dataFormatIds;  // the data format UIDs for the unbound input port
-	DigitalResearchObject objectToBindTo;  // an object containing essential info about the dataset or software that M1 has selected for binding to the unbound graph input
-
-	public UnboundGraphInput (int arrayIndexOfPort, ArrayList<Integer> dataFormatIds, Integer softwareId) {
-		this.softwareId = softwareId;
+	public UnboundGraphInput (int arrayIndexOfPort, ArrayList<Integer> dataFormatIds, SoftwareNode node) {
+		this.node = node;
 		this.arrayIndexOfPort = arrayIndexOfPort;	
 		this.dataFormatIds = dataFormatIds;
 	}
@@ -34,7 +33,7 @@ public class UnboundGraphInput {
 		return this.objectToBindTo;
 	}
 
-	public Integer getSoftwareId() {
-		return this.softwareId;
+	public SoftwareNode getSoftwareNode() {
+		return this.node;
 	}
 }

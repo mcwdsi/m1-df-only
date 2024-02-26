@@ -12,33 +12,12 @@ public class GenerateAndTest {
 	// gList accumulates the graphs composed by M1
 	static ArrayList<MutableValueGraph<Node, Integer>> gList = null;
 
-	// forwardSearch is called on concrete workflows, whose only unbound ports are output ports.  
-	// forwardSearch extends the workflows by instantiating uninstantiated software outputs with additional software
-	// The secret to forwardSearch() is that it distinguishes between the addition of single-input software -- 
-	// which it can do depth first by calling itself recursively -- and the addition of multi-input software, for which it requires
-	// the assistance of backSearch() to determine whether the additional inputs of the added software can be satisfied.
-
-	/* Pseudocode for forwardSearch
-	 * For each uninstantiated output node {
-			If DF-match-list.isEmpty() {}
-			Else {
-				For each item on the DF-match list {
-				g1 = clone(g)create a clone of g. 
-				g1.add(softwareNode)
-				if (softwareNode has exactly 1 input port)
-					forwardSearch(g1);
-				else
-					backSearch(g1);
-						} //next item
-					} //next uninstantiated output node;
-	 */	
-
 	public static boolean forwardSearch(MutableValueGraph<Node, Integer> g)
 	{	
 		UnboundGraphOutput ugo;	// will point to a specific unbound output SoftwarePort in a SoftwareNode in graph g
 
 		// get list of unbound outports in graph g
-		ArrayList<UnboundGraphOutput> unboundGraphOutputList = getUnboundGraphOutputList(g); 
+		ArrayList<UnboundGraphOutput> unboundGraphOutputList = getUnboundGraphOutputs(g); 
 
 		//For each unbound outport in the list
 		Iterator<UnboundGraphOutput> ugoIter = unboundGraphOutputList.iterator(); 
@@ -70,16 +49,17 @@ public class GenerateAndTest {
 					MutableValueGraph<Node, Integer> g1 = makeDagClone(g);    
 
 					// get the unbound software in g1 and "bind" it to the matching software
-
-					Iterator<Node> iter = g1.nodes().iterator();  
-					SoftwareNode sUnbound = new SoftwareNode(666);  // will point to the unbound node in g1
-					while (iter.hasNext()) {  // can't just use array index to go right to software node.  have to look through them to find it
-						sUnbound = (SoftwareNode) iter.next();
-						if (sUnbound.uid.equals(ugo.softwareId)) {
+					SoftwareNode sUnbound = null;
+					Integer nodeId = ugo.getSoftwareNode().nodeId;
+					Iterator<Node> iter2 = g1.nodes().iterator();
+					while (iter2.hasNext()) {
+						SoftwareNode snNext = (SoftwareNode)iter2.next();
+						if (snNext.nodeId.equals(nodeId)) {
+							sUnbound = snNext;
 							break;
 						}
 					}
-					//  
+					
 					// add the softwareId and portNumber of the matching software to the unbound software in the graph
 					sUnbound.outputPorts.get(ugo.arrayIndexOfPort).setBoundToObjectId(matchingSoftware.rdoId);
 					sUnbound.outputPorts.get(ugo.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(matchingSoftware.portNumber);
@@ -87,14 +67,14 @@ public class GenerateAndTest {
 
 					// create a software node for the matching software, add the info about the software port in the graph to it, then add the node to g1
 					SoftwareNode ms = makeSoftwareNode(matchingSoftware.rdoId);
-					ms.inputPorts.get(matchingSoftware.portNumber).setBoundToObjectId(ugo.softwareId);
+					ms.inputPorts.get(matchingSoftware.portNumber).setBoundToObjectId(ugo.node.softwareId);
 					ms.inputPorts.get(matchingSoftware.portNumber).setBoundToSoftwarePortArrayIndex(ugo.arrayIndexOfPort);
 					ms.inputPorts.get(matchingSoftware.portNumber).setBoundViaDataFormatId(matchingSoftware.getDataFormat());
 
 					g1.addNode(ms);		
 
 					// if the added software only has one input, then the graph has no unbound input and qualifies as a new workflow, so add it to gList and print it to Std Out.
-					if (ms.numInputs()==1) {
+					if (ms.numInputs()==1 && test(g1)) {
 						gList.add(g1);
 						System.out.println("\n" + gList.size() + ". New Graph composed during forwardSearch()");	
 
@@ -108,6 +88,38 @@ public class GenerateAndTest {
 
 		}
 		return true;
+	}
+	
+	
+	public static boolean forwardSearchFromDataset(Integer datasetId) {
+		MutableValueGraph<Node, Integer>  g;
+
+		ArrayList<Software> dfMatchingSoftwareList; 
+		Integer dataFormatId = (Integer)datasetId/100;  // Hack only works for Test collection  
+		dfMatchingSoftwareList = sddfr.softwareByInputDataformat(dataFormatId); //exactly how forwardSearch gets a list
+		Iterator<Software> dfmsIter = dfMatchingSoftwareList.iterator();
+
+		if (!dfMatchingSoftwareList.isEmpty()) { 
+			//For each instance of Software in dfMatchSoftware
+			Software dfms;  // a data-format matching instance of Software
+			SoftwareNode sn; // an instance of SoftwareNode
+			while(dfmsIter.hasNext()) {
+				dfms = dfmsIter.next();
+				sn = makeSoftwareNode(dfms.rdoId);
+
+				//dfms knows which sn inport connects to the dataset 
+				sn.inputPorts.get(dfms.portNumber).setBoundToObjectId(datasetId);  		
+				g = ValueGraphBuilder.directed().build();
+				g.addNode(sn);
+
+				//If s has exactly one input port,
+				if (sn.inputPorts.size()==1)
+					forwardSearch(g); 
+				else
+					backSearch(g);
+			}
+		}
+		return(true);
 	}
 
 	public static boolean graphsAreEqual(MutableValueGraph<Node, Integer> g1, MutableValueGraph<Node, Integer> g2) {
@@ -194,11 +206,13 @@ public class GenerateAndTest {
 			Iterator<DigitalResearchObject> iterInput1 = dfMatchingInputObjectLists.get(0).iterator();  
 			while (iterInput1.hasNext()) {
 				unboundGraphInputs.get(0).setObjectToBindTo(iterInput1.next()); // for >1 output software, need to go from iterInput1.next() to a port (or hack the change in unboundGraphInputs )
+				UnboundGraphInput ugit2 = unboundGraphInputs.get(0);
 				if(numUnboundInputs == 1) extendAndPrintGraph(g, unboundGraphInputs);
 				if (numUnboundInputs>1) {
 					Iterator<DigitalResearchObject> iterInput2 = dfMatchingInputObjectLists.get(1).iterator();  
 					while (iterInput2.hasNext()) {
 						unboundGraphInputs.get(1).setObjectToBindTo(iterInput2.next());
+						UnboundGraphInput ugitemp = unboundGraphInputs.get(1);
 						if(numUnboundInputs == 2) extendAndPrintGraph(g, unboundGraphInputs);
 						if (numUnboundInputs>2) {
 							Iterator<DigitalResearchObject> iterInput3 = dfMatchingInputObjectLists.get(2).iterator();  
@@ -278,7 +292,7 @@ public class GenerateAndTest {
 					SoftwarePort p = iter2.next();
 					//System.out.println("Port is " + p.portID + " boundTo is " + p.boundToObjectId + " type is " + p.type); 
 					if (p.boundToObjectId==0) {  // could be null or zero if we don't initialize new ports to 0 !!!
-						ugi = new UnboundGraphInput(portCtr, p.getDataFormats(), p.softwareID); // software array index, port array index, data format UID
+						ugi = new UnboundGraphInput(portCtr, p.getDataFormats(), s); // software array index, port array index, data format UID
 						unboundGraphInputList.add(ugi);
 						//System.out.println("Port is " + p.uid + " boundTo is " + p.boundTo + "\n");        				
 					}
@@ -295,7 +309,7 @@ public class GenerateAndTest {
 	// getUnboundGraphOutputs iterates through all the nodes in a graph and within them their output ports to find "unbound" outputs
 	// TODO:  create a WorkflowGraph class and move this method into it.  Note that I already created an UnboundGraphOutput Class
 
-	public static ArrayList<UnboundGraphOutput> getUnboundGraphOutputList(MutableValueGraph<Node, Integer> g) { 
+	public static ArrayList<UnboundGraphOutput> getUnboundGraphOutputs(MutableValueGraph<Node, Integer> g) { 
 
 		ArrayList<UnboundGraphOutput> unboundGraphOutputList = new ArrayList<UnboundGraphOutput>();
 
@@ -315,7 +329,7 @@ public class GenerateAndTest {
 				while (iter2.hasNext()) {
 					p = iter2.next();
 					if (p.boundToObjectId==0) {
-						ugo = new UnboundGraphOutput(portCtr, p.getDataFormats(), p.softwareID); // software array index, port array index, data format UID
+						ugo = new UnboundGraphOutput(portCtr, p.getDataFormats(), s); // software array index, port array index, data format UID
 						ugo.setSoftwareToBindTo(p.boundToObjectId);  //  just being explicit that it is unbound
 						unboundGraphOutputList.add(ugo);
 						//System.out.println("Port is " + p.uid + " boundTo is " + p.boundTo + "\n");        				
@@ -346,52 +360,55 @@ public class GenerateAndTest {
 			while (unboundGraphInputIterator.hasNext() ) {
 				ugi = unboundGraphInputIterator.next();
 
-				// bind ID of dataset or software to the unbound input port in the g1
-				Iterator<Node> iter = g1.nodes().iterator();  // unfortunately value graphs convert 1 step to this mess.		
-				while (iter.hasNext()) {  // a workaround to find a software node in the MutableValueGraph.
-					s = (SoftwareNode) iter.next();
-					// is s is the graph node we are looking for (the one specified in UnknownGraphInput)?  
-					if (s.uid.equals(ugi.softwareId)) {
-						// then "bind" it to the the DigitalResearchObject specified in UnknownGraphInput 
-						// first bind its unique id.  If the DigitalResearchObject is a Dataset, that's all we need to do
-						s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToObjectId(ugi.getObjectToBindTo().rdoId); 
-						// if its software, we also need to...
-						if (ugi.objectToBindTo instanceof Software) { 
-							//bind the software input port to 
-							Software x = (Software) ugi.getObjectToBindTo();  // necessary to cast ResearchDigitalObject to Software
-							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(x.portNumber);
-							s.inputPorts.get(ugi.arrayIndexOfPort).setBoundViaDataFormatId(x.getDataFormat());
-
-							//make a SoftwareNode for software s to add to graph
-							sn = makeSoftwareNode(ugi.objectToBindTo.rdoId); // sn is returned with all its ports.  Just need to set its output boundTo element
-
-							//now bind the unbound output port of sn
-							//int portNumber =  x.portNumber
-							sn.outputPorts.get(x.portNumber).setBoundToObjectId(ugi.softwareId);		
-							sn.outputPorts.get(x.portNumber).setBoundToSoftwarePortArrayIndex(ugi.arrayIndexOfPort);
-							sn.outputPorts.get(x.portNumber).setBoundViaDataFormatId(x.getDataFormat());
-
-							newSoftwareNodes.add(sn);	
-						}
+				//get the software node for this ugi
+				Integer nodeId = ugi.getSoftwareNode().nodeId;
+				Iterator<Node> iter2 = g1.nodes().iterator();
+				s = null;
+				while (iter2.hasNext()) {
+					SoftwareNode snNext = (SoftwareNode)iter2.next();
+					if (snNext.nodeId.equals(nodeId)) {
+						s = snNext;
 						break;
 					}
+				}
+				
+				// then "bind" it to the the DigitalResearchObject specified in UnknownGraphInput 
+				// first bind its unique id.  If the DigitalResearchObject is a Dataset, that's all we need to do
+				s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToObjectId(ugi.getObjectToBindTo().rdoId); 
+	
+				// if its software, we also need to...
+				if (ugi.objectToBindTo instanceof Software) { 
+					//bind the software input port to 
+					Software x = (Software) ugi.getObjectToBindTo();  // necessary to cast ResearchDigitalObject to Software
+					s.inputPorts.get(ugi.arrayIndexOfPort).setBoundToSoftwarePortArrayIndex(x.portNumber);
+					s.inputPorts.get(ugi.arrayIndexOfPort).setBoundViaDataFormatId(x.getDataFormat());
+
+					//make a SoftwareNode for software s to add to graph
+					sn = makeSoftwareNode(ugi.objectToBindTo.rdoId); // sn is returned with all its ports.  Just need to set its output boundTo element
+
+					//now bind the unbound output port of sn
+					//int portNumber =  x.portNumber
+					sn.outputPorts.get(x.portNumber).setBoundToObjectId(ugi.getSoftwareNode().softwareId);		
+					sn.outputPorts.get(x.portNumber).setBoundToSoftwarePortArrayIndex(ugi.arrayIndexOfPort);
+					sn.outputPorts.get(x.portNumber).setBoundViaDataFormatId(x.getDataFormat());
+
+					newSoftwareNodes.add(sn);	
 				}
 			}
 			/// Here's where we add any new software to graph g1 !!
 			Iterator<Node> iter2 = newSoftwareNodes.iterator();
 			while (iter2.hasNext()) g1.addNode(iter2.next());
 
-
-			if (isAbstractWorkflow(g1)) {
-				//int graphSize = gList.size() + 1;
-				//System.out.println("In extendAndPrintGraph, about to call backSearch on graph # " + graphSize);
+			if (isBackwardsExtendableWorkflow(g1)) {
+				int graphSize = gList.size() + 1;
+				//System.out.println("In extendAndPrintGraph, about to call backSearch on graph " + graphToString(g1));
 				//if (graphSize == 126) {
 				//	printGraph(g1);
 				//}
 				backSearch(g1);
 			} 
-			else { // it is a concrete workflow, so we add it to gList and print it
-				//if (gList == null) gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+
+			if (!isAbstractWorkflow(g1) && test(g1)) {
 				gList.add(g1); 
 				System.out.println("\n" + gList.size() + ". New Graph composed during backSearch()");	
 				printGraph(g1);
@@ -401,6 +418,10 @@ public class GenerateAndTest {
 					forwardSearch(g1);
 				}
 			}
+		}
+
+		public static boolean test(MutableValueGraph<Node, Integer> g) {
+			return true;
 		}
 
 		public static boolean isAbstractWorkflow(MutableValueGraph<Node, Integer> g) {
@@ -416,13 +437,17 @@ public class GenerateAndTest {
 			*/
 			boolean isAbstract = false;
 			for (UnboundGraphInput ugi : ugiList) {
-				isAbstract = isAbstract || !sddfr.isDataService(ugi.getSoftwareId());
+				isAbstract = isAbstract || !sddfr.isDataService(ugi.getSoftwareNode().softwareId);
 			}
 			return isAbstract;
 		}
 
+		public static boolean isBackwardsExtendableWorkflow(MutableValueGraph<Node, Integer> g) {
+			return !getUnboundGraphInputs(g).isEmpty();
+		}
+
 		public static boolean hasUnboundGraphOutputs(MutableValueGraph<Node, Integer> g) {
-			if (getUnboundGraphOutputList(g).isEmpty()) return false;
+			if (getUnboundGraphOutputs(g).isEmpty()) return false;
 			else return true; }
 
 		public static void printGraph(MutableValueGraph<Node, Integer> g){
@@ -433,7 +458,7 @@ public class GenerateAndTest {
 				s = (SoftwareNode) iter.next();
 				Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
 				Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
-				String softwareInfo = s.uid + " (" + s.title + ")";
+				String softwareInfo = s.softwareId + " (" + s.title + ")";
 				System.out.println(" Software " + softwareInfo);
 
 				while (iterIp.hasNext())  {
@@ -483,7 +508,7 @@ public class GenerateAndTest {
 				s = (SoftwareNode) iter.next();
 				Iterator<SoftwarePort> iterIp = s.inputPorts.iterator();
 				Iterator<SoftwarePort> iterOp = s.outputPorts.iterator();
-				String softwareInfo = s.uid + " (" + s.title + ")";
+				String softwareInfo = s.softwareId + " (" + s.title + ")";
 				sb.append("***");
 				sb.append("Software ");
 				sb.append(softwareInfo);
@@ -540,7 +565,7 @@ public class GenerateAndTest {
 		}
 
 		public static SoftwareNode makeSoftwareNode(Integer softwareID) {
-			SoftwareNode sn  = new SoftwareNode(softwareID);
+			SoftwareNode sn  = new SoftwareNode(softwareID, softwareID);
 			if (sm != null) {
 				sn.title = sm.getTitleForSoftware(softwareID);
 			}
@@ -573,7 +598,7 @@ public class GenerateAndTest {
 			Iterator<Node> iter = g.nodes().iterator();
 			while (iter.hasNext() ) {
 				s = (SoftwareNode) iter.next();
-				s1 = new SoftwareNode(s.uid);  // constructor requires a uid and we want the graph to have the same software as the old!
+				s1 = new SoftwareNode(s.nodeId, s.softwareId);  // constructor requires a uid and we want the graph to have the same software as the old!
 				s1.title = s.title;
 
 				Iterator<SoftwarePort> iterIP = s.inputPorts.iterator();

@@ -28,15 +28,39 @@ public class TestM1 {
 	{
 		//	Software(Integer objectId, PortType portType, int portNumber) 
 		runOnTestCollection();
-		runOnMdcSubset("small-set");
-		runOnMdcSubset("restricted");
+		runDatasetsOnTestCollection();
+		runOnMdcSubset("small-set");  //restore to active
+		runOnMdcSubset("restricted"); //restor to active when done
 		//runOnMdcSubset("limited");
 		//runOnMdcSubset("precision-eval");
-		runOnMdcSubset("curated");
+		runOnMdcSubset("curated2");   // restore to active when done
     }
+	
+	public static void runDatasetsOnTestCollection() throws CloneNotSupportedException {
+		// loop through datasets to test M1's ability to seed search w/ a new dataset
+		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
+		GenerateAndTest.sddfr = sddfr;
+		ArrayList<MutableValueGraph<Node, Integer>> gList = new ArrayList<MutableValueGraph<Node, Integer>>();
+		GenerateAndTest.gList = gList;
+		
+	   	// run datasets as new datasets
+		ArrayList<Integer> datasetList = new ArrayList<>(Arrays.asList(200,300,400,600)); // (200,201,202,300,301,302,400,600)
+		Iterator<Integer> iterDatasetList = datasetList.iterator();
+		Integer datasetId;
+		while(iterDatasetList.hasNext()) {
+			datasetId = iterDatasetList.next();
+			System.out.println("***********************************");
+			System.out.println("DATASET " + datasetId + " is triggering M1 search:");
+			System.out.println("***********************************");
+			GenerateAndTest.forwardSearchFromDataset(datasetId);
+		}
+
+		postProcessGraphs();
+	}
 
     public static void runOnTestCollection() throws CloneNotSupportedException {
-		// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
+    	
+    	// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
 		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList( 1000,1001,1002,2000, 2001, 2002, 2002, 2003)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
 		Iterator<Integer> iterSoftwareList = softwareList.iterator();
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
@@ -45,7 +69,7 @@ public class TestM1 {
 		GenerateAndTest.gList = gList;
 		while(iterSoftwareList.hasNext()) {
 			int softwareID = iterSoftwareList.next();
-			SoftwareNode s = new SoftwareNode(softwareID);
+			SoftwareNode s = new SoftwareNode(softwareID, softwareID);
 
 			// get the info about software from the repository   get input ports and get output ports
 			ArrayList<ArrayList<Integer>> inputs = sddfr.getInputDataFormatsForSoftware(softwareID);
@@ -83,13 +107,15 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 
 			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			if(GenerateAndTest.isAbstractWorkflow(g)) 
+			if(GenerateAndTest.isBackwardsExtendableWorkflow(g)) 
 				GenerateAndTest.backSearch(g);
-			else
+			if (!GenerateAndTest.isAbstractWorkflow(g)) {
 				GenerateAndTest.forwardSearch(g);
+			}
 		}
 
 		postProcessGraphs();
+
 	}
 
 	public static void runOnMdcSubset(String subsetName) {
@@ -108,7 +134,7 @@ public class TestM1 {
 		Iterator<SoftwareNode> iterSoftwareList = sm.softwareNodeIterator();
 		while (iterSoftwareList.hasNext()) {
 			SoftwareNode s = iterSoftwareList.next();
-			int softwareID = s.uid;
+			int softwareID = s.softwareId;
 			String softwareTitle = s.title;
 			MutableValueGraph<Node, Integer> g = ValueGraphBuilder.directed().build();
 			g.addNode(s);
@@ -118,10 +144,11 @@ public class TestM1 {
 			GenerateAndTest.printGraph(g);
 
 			//branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
-			if(GenerateAndTest.isAbstractWorkflow(g)) 
+			if(GenerateAndTest.isBackwardsExtendableWorkflow(g)) 
 				GenerateAndTest.backSearch(g);
-			else
+			if (!GenerateAndTest.isAbstractWorkflow(g)) {
 				GenerateAndTest.forwardSearch(g);
+			}
 		}
 
 		postProcessGraphs();
@@ -213,7 +240,7 @@ public class TestM1 {
  			while(nodeIter.hasNext()) {
  				Node n = nodeIter.next();
  				SoftwareNode sn = (SoftwareNode)n;
- 				uniqueSoftwareIds.add(sn.uid);
+ 				uniqueSoftwareIds.add(sn.softwareId);
  			}
  		}
 

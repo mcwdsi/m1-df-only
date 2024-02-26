@@ -6,12 +6,13 @@ import java.util.Iterator;
 // Software node class
 public class SoftwareNode extends Node implements Cloneable
 {
+       Integer softwareId;
 	ArrayList<SoftwarePort> inputPorts, outputPorts;  
-
 	String title;
 
-	SoftwareNode(Integer uid) { 
-	      super(uid);
+	SoftwareNode(Integer nodeId, Integer softwareId) { 
+	      super(nodeId);
+             this.softwareId = softwareId;
 	      this.inputPorts = new ArrayList<SoftwarePort>();
 	      this.outputPorts = new ArrayList<SoftwarePort>();
 	}
@@ -33,7 +34,7 @@ public class SoftwareNode extends Node implements Cloneable
               boolean eq = false;
               if (o instanceof SoftwareNode) {
                      SoftwareNode sn = (SoftwareNode)o;
-                     eq = this.uid.equals(sn.uid);
+                     eq = this.softwareId.equals(sn.softwareId);
                      eq = eq && this.title == sn.title;
                      eq = eq && arePortsEqual(this.inputPorts, sn.inputPorts);
                      eq = eq && arePortsEqual(this.outputPorts, sn.outputPorts);

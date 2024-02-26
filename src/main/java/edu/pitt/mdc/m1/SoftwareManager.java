@@ -56,7 +56,7 @@ public class SoftwareManager {
 							}
 						}
 
-						SoftwareNode sn = new SoftwareNode(id);
+						SoftwareNode sn = new SoftwareNode(id, id);
 						sn.title = title;
 
 						ArrayList<SoftwarePort> inputPorts = parseInputs(inputsJa, id);
@@ -122,7 +122,7 @@ public class SoftwareManager {
 	protected void buildHashMaps() {
 		idToSoftwareNode = new HashMap<Integer, SoftwareNode>();
 		for (SoftwareNode sn : softwareNodes) {
-			idToSoftwareNode.put(sn.uid, sn);
+			idToSoftwareNode.put(sn.nodeId, sn);
 			for (SoftwarePort sp : sn.inputPorts) {
 				ArrayList<Integer> formatIds = sp.getDataFormats();
 				for (Integer formatId : formatIds) {
