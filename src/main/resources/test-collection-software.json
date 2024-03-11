@@ -1,0 +1,125 @@
+[
+	{
+		"id": 1000,
+		"title": "Software 1000",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 2 ]
+			},
+			{
+				"number": 2,
+				"formatIds": [ 3 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 1 ]
+			},
+			{
+				"number": 2,
+				"formatIds": [ 6 ]
+			}
+
+		]
+	},
+	{
+		"id": 1001,
+		"title": "Software 1001",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 2 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 1 ]
+			}
+		]
+	},
+	{
+		"id": 1002,
+		"title": "Software 1001",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 5 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 1 ]
+			}
+		]
+	},
+	{
+		"id": 2000,
+		"title": "Software 2000",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 3 ]
+			},
+			{
+				"number": 2,
+				"formatIds": [ 4 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 2 ]
+			}
+		]
+	},
+	{
+		"id": 2001,
+		"title": "Software 2001",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 6 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 1 ]
+			}
+		]
+	},
+	{
+		"id": 2002,
+		"title": "Software 2002",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 3, 6 ]
+			}
+		],
+		"outputs": [
+			
+		]
+	},
+	{
+		"id": 2003,
+		"title": "Software 2003",
+		"subtype": "DataService",
+		"inputs": [
+			{
+				"number": 1,
+				"formatIds": [ 7 ]
+			}
+		],
+		"outputs": [
+			{
+				"number": 1,
+				"formatIds": [ 2 ]
+			}
+		]
+	}
+]
