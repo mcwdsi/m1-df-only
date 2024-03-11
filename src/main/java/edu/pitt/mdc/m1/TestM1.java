@@ -26,9 +26,9 @@ public class TestM1 {
 
 	public static void main(String args[]) throws CloneNotSupportedException
 	{
-		//	Software(Integer objectId, PortType portType, int portNumber) 
-		runOnTestCollection();
-		runDatasetsOnTestCollection();
+		runOnCollection("src/main/resources/test-collection-datasets.json",
+			"src/main/resources/test-collection-software.json");
+		//runDatasetsOnTestCollection();
 		runOnMdcSubset("small-set");  //restore to active
 		runOnMdcSubset("restricted"); //restor to active when done
 		//runOnMdcSubset("limited");
@@ -36,6 +36,7 @@ public class TestM1 {
 		runOnMdcSubset("curated2");   // restore to active when done
     }
 	
+	/* We have to rebuild this to work with SDDFR configured from files
 	public static void runDatasetsOnTestCollection() throws CloneNotSupportedException {
 		// loop through datasets to test M1's ability to seed search w/ a new dataset
 		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
@@ -57,56 +58,32 @@ public class TestM1 {
 
 		postProcessGraphs();
 	}
+	*/
 
-    public static void runOnTestCollection() throws CloneNotSupportedException {
-    	
-    	// loop through all software to test M1-data-format-only search's ability to find the full "DFM deductive closure."
-		ArrayList<Integer> softwareList = new ArrayList<>(Arrays.asList( 1000,1001,1002,2000, 2001, 2002, 2002, 2003)); //1000,1001,1002,2000, 2001, 2002 somehow causes cycle
-		Iterator<Integer> iterSoftwareList = softwareList.iterator();
-		SoftwareDatasetDataFormatRepository sddfr = SoftwareDatasetDataFormatRepository.createTestCollectionInstance();
-		GenerateAndTest.sddfr = sddfr;
+	public static void runOnCollection(String datasetFileName, String softwareFileName) {
+		DatasetManager dm = loadDatasets(datasetFileName);
+		SoftwareManager sm = loadSoftware(softwareFileName);
+		SoftwareDatasetDataFormatRepository sddfr = 
+			new SoftwareDatasetDataFormatRepository(dm, sm);
+
 		ArrayList<MutableValueGraph<Node, Integer>> gList = new ArrayList<MutableValueGraph<Node, Integer>>();
 		GenerateAndTest.gList = gList;
-		while(iterSoftwareList.hasNext()) {
-			int softwareID = iterSoftwareList.next();
-			SoftwareNode s = new SoftwareNode(softwareID, softwareID);
-
-			// get the info about software from the repository   get input ports and get output ports
-			ArrayList<ArrayList<Integer>> inputs = sddfr.getInputDataFormatsForSoftware(softwareID);
-			ArrayList<ArrayList<Integer>> outputs = sddfr.getOutputDataFormatsForSoftware(softwareID);
-			Iterator<ArrayList<Integer>> iterI = inputs.iterator();
-			Iterator<ArrayList<Integer>> iterO = outputs.iterator();
-
-			int portCtr = 0; 
-			ArrayList<Integer> portDataFormats;
-			
-			while (iterI.hasNext()) {
-				portDataFormats = iterI.next();
-				ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
-				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
-				SoftwarePort p = new SoftwarePort(softwareID, PortType.INPUT, dataFormatIds);
-				p.setPortId(portCtr++);
-				s.inputPorts.add(p);
-			}
-			
-			portCtr = 0;
-			while (iterO.hasNext()) {
-				portDataFormats = iterO.next();
-				ArrayList<Integer> dataFormatIds = new ArrayList<Integer>();
-				dataFormatIds.addAll(portDataFormats); // get the 1 data format for the inport into ArrayList<Integer> dataFormatIds
-				SoftwarePort p = new SoftwarePort(softwareID, PortType.OUTPUT, dataFormatIds);
-				p.setPortId(portCtr++);
-				s.outputPorts.add(p);
-			}
-
+		GenerateAndTest.sddfr = sddfr;
+		GenerateAndTest.sm = sm;
+		GenerateAndTest.dm = dm;
+		Iterator<SoftwareNode> iterSoftwareList = sm.softwareNodeIterator();
+		while (iterSoftwareList.hasNext()) {
+			SoftwareNode s = iterSoftwareList.next();
+			int softwareID = s.softwareId;
+			String softwareTitle = s.title;
 			MutableValueGraph<Node, Integer> g = ValueGraphBuilder.directed().build();
 			g.addNode(s);
 			System.out.println("***********************************");
-			System.out.println("SOFTWARE " + softwareID + " is triggering M1 search:");
+			System.out.println("SOFTWARE " + softwareID + " (" + softwareTitle + ") is triggering M1 search:");
 			System.out.println("***********************************");
 			GenerateAndTest.printGraph(g);
 
-			//Should branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
+			//branch on whether graph is an abstract or concrete workflow, at this stage they mean a new software or a new dataset
 			if(GenerateAndTest.isBackwardsExtendableWorkflow(g)) 
 				GenerateAndTest.backSearch(g);
 			if (!GenerateAndTest.isAbstractWorkflow(g)) {
@@ -115,7 +92,6 @@ public class TestM1 {
 		}
 
 		postProcessGraphs();
-
 	}
 
 	public static void runOnMdcSubset(String subsetName) {
